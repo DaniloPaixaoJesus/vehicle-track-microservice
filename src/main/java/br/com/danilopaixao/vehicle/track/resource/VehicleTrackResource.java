@@ -25,10 +25,10 @@ public class VehicleTrackResource {
 	@Autowired
 	private VehicleTrackService service;
 	
-	@RequestMapping(value = "/{queue}/queue", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+	@RequestMapping(value = "/queue", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
 	@ResponseStatus(HttpStatus.OK)
-	public VehicleTrack getVehicleTrack(@PathVariable("queue") final String queue) {
-		return service.getQueue(queue);
+	public Iterable<VehicleTrack> getVehicleTrack() {
+		return service.getAllVehicleTrack();
 	}
 	
 	

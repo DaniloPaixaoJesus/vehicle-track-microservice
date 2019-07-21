@@ -10,6 +10,8 @@ spring:
       simple:
         concurrency: 3
         max-concurrency: 6
+  redis:
+    url: redis://${REDIS_HOST:localhost}:${REDIS_PORT:6379}
 queue:
   vehicle:
     track:

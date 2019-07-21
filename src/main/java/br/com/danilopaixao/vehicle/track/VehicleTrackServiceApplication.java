@@ -9,12 +9,16 @@ import org.springframework.cloud.client.circuitbreaker.EnableCircuitBreaker;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 import org.springframework.cloud.client.loadbalancer.LoadBalanced;
 import org.springframework.context.annotation.Bean;
+import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.web.client.RestTemplate;
 
 @SpringBootApplication
 @EnableDiscoveryClient
 @EnableCircuitBreaker
 @EnableRabbit
+@EnableScheduling
 public class VehicleTrackServiceApplication {
 	
 	@Value("${queue.vehicle.track.name}")
@@ -32,6 +36,18 @@ public class VehicleTrackServiceApplication {
 //		clientHttpRequestFactory.setConnectTimeout(2000);
 //		return new RestTemplate(clientHttpRequestFactory);
 	}
+    
+    @Bean
+    public JedisConnectionFactory jedisConnectionFactory() {
+        return new JedisConnectionFactory();
+    }
+     
+    @Bean
+    public RedisTemplate<String, Object> redisTemplate() {
+        RedisTemplate<String, Object> template = new RedisTemplate<>();
+        template.setConnectionFactory(jedisConnectionFactory());
+        return template;
+    }
     
     @Bean
     public Queue queue() {

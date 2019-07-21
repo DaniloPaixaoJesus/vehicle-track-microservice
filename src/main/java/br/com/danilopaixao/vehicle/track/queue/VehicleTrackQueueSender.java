@@ -1,5 +1,7 @@
 package br.com.danilopaixao.vehicle.track.queue;
 
+import java.util.Date;
+
 import org.springframework.amqp.core.Queue;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,7 +26,7 @@ public class VehicleTrackQueueSender {
     @Autowired
     private Queue queue;
  
-    public VehicleTrack sendQueue(String vin) throws JsonProcessingException {
+    public VehicleTrack sendQueue(final String vin) throws JsonProcessingException {
     	
     	Vehicle vehicle = vehicleService.getVehicle(vin);
     	if( vehicle == null
@@ -32,9 +34,10 @@ public class VehicleTrackQueueSender {
     			|| vehicle.getVin().isEmpty()) {
     		return null;
     	}
+    	
     	ObjectMapper jsonMapper = new ObjectMapper();
-    	VehicleTrack vehicleTrack = new VehicleTrack(vehicle.getVin(), "", "ON");
-    	String payload = jsonMapper.writeValueAsString(vehicleTrack);
+    	VehicleTrack vehicleTrack = new VehicleTrack(vehicle.getVin(), "", "ON", new Date());
+    	 String payload = jsonMapper.writeValueAsString(vehicleTrack);
         rabbitTemplate.convertAndSend(this.queue.getName(), payload);
         return vehicleTrack;
     }
