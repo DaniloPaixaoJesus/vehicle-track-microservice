@@ -1,11 +1,16 @@
 package br.com.danilopaixao.vehicle.track.service;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import br.com.danilopaixao.vehicle.track.model.VehicleTrack;
+import br.com.danilopaixao.vehicle.track.queue.VehicleTrackQueueSender;
 
 @Service
 public class VehicleTrackService {
+	
+	@Autowired
+	private VehicleTrackQueueSender vehicleTrackQueueSender;
 	
 	public VehicleTrack getQueue(final String queue) {
 		/**
@@ -18,24 +23,7 @@ public class VehicleTrackService {
 		//return new VehicleTrack("YS2R4X20005399401", "12345", "OFF");
 	}
 
-	public String insertIntoQueue(String vin) {
-		/**
-		 * TODO:
-		 * 	1 - consulta api de veiculo 
-		 * 	2 - insert RabbitM 
-		 */
-		String generatedQueue = "12345";
-		return "/api/v1/vehicle-track/"+generatedQueue+"/queue";
-	}
-	
-	public String pushQueue(String vin) {
-		/**
-		 * TODO: 
-		 * 1 - consulta dados do RabbitM
-		 * 2 - atualiza Redis
-		 * 3 - envia api rest para atualizar status 
-		 */
-		String generatedQueue = "12345";
-		return "/api/v1/vehicle-track/"+generatedQueue+"/queue";
+	public VehicleTrack insertIntoQueue(String vin) throws Throwable {
+		return vehicleTrackQueueSender.sendQueue(vin);
 	}
 }

@@ -34,35 +34,19 @@ public class VehicleTrackResource {
 	
 	@PutMapping("/{vin}")
 	@ResponseStatus(HttpStatus.ACCEPTED)
-	public ResponseEntity<String> updateStatus(@PathVariable("vin") final String vin) {
+	public ResponseEntity<VehicleTrack> updateStatus(@PathVariable("vin") final String vin) throws Throwable {
+		
+		VehicleTrack vehicleTrack = service.insertIntoQueue(vin);
+		
 		MultiValueMap<String, String> header = new LinkedMultiValueMap<String, String>();
-		String queueLocation = service.insertIntoQueue(vin);
-		header.put("Location", Arrays.asList(queueLocation));
-		return new ResponseEntity<String>(queueLocation, header, HttpStatus.ACCEPTED);
+		if(vehicleTrack == null) {
+			return new ResponseEntity<VehicleTrack>(null, null, HttpStatus.NOT_FOUND);
+		}
+		
+		String locationHeader = "/api/v1/vehicle-track/"+vehicleTrack.getVin()+"/queue";
+		header.put("Location", Arrays.asList(locationHeader));
+		
+		return new ResponseEntity<VehicleTrack>(vehicleTrack, header, HttpStatus.ACCEPTED);
 	}
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
 	
 }
