@@ -24,19 +24,24 @@ public class VehicleTrackQueueConsumer {
 	
     @RabbitListener(queues = {"${queue.vehicle.track.name}"})
     public void receive(@Payload String payload) {
+    	
+    	System.out.println("###### VehicleTrackQueueConsumer#receive#"+payload);
+    	
     	ObjectMapper jsonMapper = new ObjectMapper();
     	VehicleTrack vehicleTrackPayload = null;
       	try {
       		vehicleTrackPayload = jsonMapper.readValue(payload, VehicleTrack.class);
       		
-      		VehicleTrack vehicleTrack = vehicleTrackService.getVehicleTrack(vehicleTrackPayload.getVin());
-        	if (vehicleTrack == null) {
-        		vehicleTrack = new VehicleTrack(vehicleTrackPayload.getVin(), "", "ON", new Date());
-        		vehicleTrackService.insertVehicleTrack(vehicleTrack);
+      		VehicleTrack vehicleTrackRedis = vehicleTrackService.getVehicleTrack(vehicleTrackPayload.getVin());
+      		
+        	if (vehicleTrackRedis == null) {
+        		vehicleTrackRedis = new VehicleTrack(vehicleTrackPayload.getVin(), "", "ON", new Date());
+        		vehicleTrackService.insertVehicleTrack(vehicleTrackRedis);
         		vehicleService.updateVehicle(vehicleTrackPayload.getVin(), "ON");
-        	}else if (vehicleTrack.getStatus().equalsIgnoreCase("OFF")){
-        		vehicleTrack.setStatus("ON");
-        		vehicleTrackService.updateVehicleTrack(vehicleTrack);
+        	}else if (vehicleTrackRedis.getStatus().equalsIgnoreCase("OFF")){
+        		vehicleTrackRedis.setStatus("ON");
+        		vehicleTrackService.updateVehicleTrack(vehicleTrackRedis);
+        		vehicleService.updateVehicle(vehicleTrackPayload.getVin(), "ON");
         	}
         	
 		} catch (Exception e) {

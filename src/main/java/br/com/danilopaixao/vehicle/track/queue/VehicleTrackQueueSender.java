@@ -27,7 +27,7 @@ public class VehicleTrackQueueSender {
     private Queue queue;
  
     public VehicleTrack sendQueue(final String vin) throws JsonProcessingException {
-    	
+    	System.out.println("###### VehicleTrackQueueSender#sendQueue#"+vin);
     	Vehicle vehicle = vehicleService.getVehicle(vin);
     	if( vehicle == null
     			|| vehicle.getVin() == null
@@ -36,7 +36,7 @@ public class VehicleTrackQueueSender {
     	}
     	
     	ObjectMapper jsonMapper = new ObjectMapper();
-    	VehicleTrack vehicleTrack = new VehicleTrack(vehicle.getVin(), "", "ON", new Date());
+    	VehicleTrack vehicleTrack = new VehicleTrack(vin, "", "ON", new Date());
     	 String payload = jsonMapper.writeValueAsString(vehicleTrack);
         rabbitTemplate.convertAndSend(this.queue.getName(), payload);
         return vehicleTrack;
