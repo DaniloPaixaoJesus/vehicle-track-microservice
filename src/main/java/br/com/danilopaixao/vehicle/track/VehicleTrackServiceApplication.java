@@ -14,6 +14,8 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.web.client.RestTemplate;
 
+import br.com.danilopaixao.vehicle.track.repository.VehicleTrackerMapRepository;
+
 @SpringBootApplication
 @EnableDiscoveryClient
 @EnableCircuitBreaker
@@ -29,6 +31,11 @@ public class VehicleTrackServiceApplication {
     }
     
     @Bean
+    public VehicleTrackerMapRepository getVehicleTrackerMapRepository() {
+    	return new VehicleTrackerMapRepository();
+    }
+    
+    @Bean
 	@LoadBalanced
 	public RestTemplate getRestTemplate() {
 		return new RestTemplate();
@@ -37,10 +44,27 @@ public class VehicleTrackServiceApplication {
 //		return new RestTemplate(clientHttpRequestFactory);
 	}
     
+    /**
+       	redis:
+    		url: redis://${REDIS_HOST:localhost}:${REDIS_PORT:6379}
+    	
+    	  redis:
+		    host: ${REDIS_HOST:localhost}
+		    port: ${REDIS_PORT:6379}
+     * @return
+     */
     @Bean
     public JedisConnectionFactory jedisConnectionFactory() {
         return new JedisConnectionFactory();
     }
+    
+//    @Bean
+//    JedisConnectionFactory jedisConnectionFactory() {
+//        JedisConnectionFactory jedisConFactory = new JedisConnectionFactory();
+//        jedisConFactory.setHostName("redis://redis:6379");
+//        jedisConFactory.setPort(6379);
+//        return jedisConFactory;
+//    }
      
     @Bean
     public RedisTemplate<String, Object> redisTemplate() {

@@ -1,6 +1,7 @@
 package br.com.danilopaixao.vehicle.track.service;
 
 import java.util.Date;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -8,13 +9,13 @@ import org.springframework.stereotype.Service;
 
 import br.com.danilopaixao.vehicle.track.model.VehicleTrack;
 import br.com.danilopaixao.vehicle.track.queue.VehicleTrackQueueSender;
-import br.com.danilopaixao.vehicle.track.repository.VehicleTrackRepository;
+import br.com.danilopaixao.vehicle.track.repository.VehicleTrackerMapRepository;
 
 @Service
 public class VehicleTrackService {
 	
 	@Autowired
-	private VehicleTrackRepository vehicleTrackRepository;
+	private VehicleTrackerMapRepository vehicleTrackRepository;
 	
 	@Autowired
 	private VehicleTrackQueueSender vehicleTrackQueueSender;
@@ -24,9 +25,11 @@ public class VehicleTrackService {
 	
 	@Scheduled(cron = "0/59 * * * * ?")
 	public void processOffLineVehicle() {
-		vehicleTrackRepository
-			.findAll()
-			.forEach(tracker -> {
+		List<VehicleTrack> cache = vehicleTrackRepository.getAll();
+		if(cache == null) {
+			return;
+		}
+		cache.forEach(tracker -> {
 				if(tracker.getStatus().equalsIgnoreCase("ON")) {
 					if(setOffLineVehicle(tracker.getDtStatus())) {
 						System.out.println("PASSOU DE 1 MIN - MUDA PRA OFFLINE");
@@ -70,23 +73,23 @@ public class VehicleTrackService {
 		}
 
 	}
-
+	
 	public VehicleTrack insertIntoQueue(String vin) throws Throwable {
 		return vehicleTrackQueueSender.sendQueue(vin);
 	}
 	
 	public VehicleTrack insertVehicleTrack(VehicleTrack vehicleTrack) {
-		return vehicleTrackRepository.save(vehicleTrack);
-	}
-	
-	public Iterable<VehicleTrack> getAllVehicleTrack() {
-		return vehicleTrackRepository.findAll();
+		return vehicleTrackRepository.put(vehicleTrack.getVin(), vehicleTrack);
 	}
 	
 	public VehicleTrack getVehicleTrack(String vin) {
-		return vehicleTrackRepository.findById(vin).orElse(null);
+		return vehicleTrackRepository.get(vin);
 	}
 	
+	public List<VehicleTrack> getAllVehicleTrack() {
+		return vehicleTrackRepository.getAll();
+	}
+
 	public VehicleTrack updateVehicleTrack(VehicleTrack vehicleTrack) {
 		return vehicleTrackRepository.save(vehicleTrack);
 	}

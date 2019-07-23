@@ -32,15 +32,15 @@ public class VehicleTrackQueueConsumer {
       	try {
       		vehicleTrackPayload = jsonMapper.readValue(payload, VehicleTrack.class);
       		
-      		VehicleTrack vehicleTrackRedis = vehicleTrackService.getVehicleTrack(vehicleTrackPayload.getVin());
+      		VehicleTrack vehicleTrackCache = vehicleTrackService.getVehicleTrack(vehicleTrackPayload.getVin());
       		
-        	if (vehicleTrackRedis == null) {
-        		vehicleTrackRedis = new VehicleTrack(vehicleTrackPayload.getVin(), "", "ON", new Date());
-        		vehicleTrackService.insertVehicleTrack(vehicleTrackRedis);
+        	if (vehicleTrackCache == null) {
+        		vehicleTrackCache = new VehicleTrack(vehicleTrackPayload.getVin(), "", "ON", new Date());
+        		vehicleTrackService.insertVehicleTrack(vehicleTrackCache);
         		vehicleService.updateVehicle(vehicleTrackPayload.getVin(), "ON");
-        	}else if (vehicleTrackRedis.getStatus().equalsIgnoreCase("OFF")){
-        		vehicleTrackRedis.setStatus("ON");
-        		vehicleTrackService.updateVehicleTrack(vehicleTrackRedis);
+        	}else if (vehicleTrackCache.getStatus().equalsIgnoreCase("OFF")){
+        		vehicleTrackCache.setStatus("ON");
+        		vehicleTrackService.updateVehicleTrack(vehicleTrackCache);
         		vehicleService.updateVehicle(vehicleTrackPayload.getVin(), "ON");
         	}
         	
