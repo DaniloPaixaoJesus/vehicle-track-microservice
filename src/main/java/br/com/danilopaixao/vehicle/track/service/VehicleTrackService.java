@@ -9,13 +9,17 @@ import org.springframework.stereotype.Service;
 
 import br.com.danilopaixao.vehicle.track.model.VehicleTrack;
 import br.com.danilopaixao.vehicle.track.queue.VehicleTrackQueueSender;
-import br.com.danilopaixao.vehicle.track.repository.VehicleTrackerMapRepository;
+import br.com.danilopaixao.vehicle.track.repository.VehicleTrackMapRepository;
+import br.com.danilopaixao.vehicle.track.repository.VehicleTrackRepository;
 
 @Service
 public class VehicleTrackService {
 	
 	@Autowired
-	private VehicleTrackerMapRepository vehicleTrackRepository;
+	private VehicleTrackRepository vehicleTrackRepository;
+	
+	@Autowired
+	private VehicleTrackMapRepository vehicleTrackMapRepository;
 	
 	@Autowired
 	private VehicleTrackQueueSender vehicleTrackQueueSender;
@@ -23,9 +27,13 @@ public class VehicleTrackService {
 	@Autowired
 	private VehicleService vehicleService;
 	
+	public Iterable<VehicleTrack> testRedis() {
+		return vehicleTrackRepository.findAll();
+	}
+	
 	@Scheduled(cron = "0/59 * * * * ?")
 	public void processOffLineVehicle() {
-		List<VehicleTrack> cache = vehicleTrackRepository.getAll();
+		List<VehicleTrack> cache = vehicleTrackMapRepository.getAll();
 		if(cache == null) {
 			return;
 		}
@@ -79,18 +87,18 @@ public class VehicleTrackService {
 	}
 	
 	public VehicleTrack insertVehicleTrack(VehicleTrack vehicleTrack) {
-		return vehicleTrackRepository.put(vehicleTrack.getVin(), vehicleTrack);
+		return vehicleTrackMapRepository.put(vehicleTrack.getVin(), vehicleTrack);
 	}
 	
 	public VehicleTrack getVehicleTrack(String vin) {
-		return vehicleTrackRepository.get(vin);
+		return vehicleTrackMapRepository.get(vin);
 	}
 	
 	public List<VehicleTrack> getAllVehicleTrack() {
-		return vehicleTrackRepository.getAll();
+		return vehicleTrackMapRepository.getAll();
 	}
 
 	public VehicleTrack updateVehicleTrack(VehicleTrack vehicleTrack) {
-		return vehicleTrackRepository.save(vehicleTrack);
+		return vehicleTrackMapRepository.save(vehicleTrack);
 	}
 }

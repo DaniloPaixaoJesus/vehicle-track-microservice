@@ -7,7 +7,7 @@ import java.util.Map;
 
 import br.com.danilopaixao.vehicle.track.model.VehicleTrack;
 
-public class VehicleTrackerMapRepository {
+public class VehicleTrackMapRepository {
 	
 	private Map<String, VehicleTrack> vehicles;
 	private int quantity = 0;
@@ -35,7 +35,7 @@ public class VehicleTrackerMapRepository {
 		return vehicles;
 	}
 	
-	public VehicleTrackerMapRepository() {
+	public VehicleTrackMapRepository() {
 		vehicles = new HashMap<String, VehicleTrack>();
 	}
 
