@@ -4,7 +4,7 @@ The solution is running into AWS EC2 instance http://swedish-challenge.danilopai
 You can send pings to verify if the vehicle is online on url http://swedish-challenge.danilopaixao.com.br:8085/send.html
 
 ### Architecture
-![](https://https://s3.amazonaws.com/bucket.danilopaixao.com.br/spring-cloud-vehicle-solution.png)
+![](https://s3.amazonaws.com/bucket.danilopaixao.com.br/spring-cloud-vehicle-solution.png)
 
 The solution was built with Spring Cloud Microservices Chassis Framework.
 Service discovery: Spring Cloud Netflix Eureka. 
