@@ -40,9 +40,9 @@ public class VehicleTrackResource {
 	
 	@PutMapping("/{vin}")
 	@ResponseStatus(HttpStatus.ACCEPTED)
-	public ResponseEntity<VehicleTrack> updateStatus(@PathVariable("vin") final String vin) throws Throwable {
+	public ResponseEntity<VehicleTrack> updateOnlineStatus(@PathVariable("vin") final String vin) throws Throwable {
 		
-		VehicleTrack vehicleTrack = service.insertIntoQueue(vin);
+		VehicleTrack vehicleTrack = service.insertIntoQueueOnlineStatus(vin);
 		
 		MultiValueMap<String, String> header = new LinkedMultiValueMap<String, String>();
 		if(vehicleTrack == null) {
