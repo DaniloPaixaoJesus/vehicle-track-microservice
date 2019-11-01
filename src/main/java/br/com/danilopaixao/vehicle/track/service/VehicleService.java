@@ -1,5 +1,7 @@
 package br.com.danilopaixao.vehicle.track.service;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -14,6 +16,8 @@ import br.com.danilopaixao.vehicle.track.model.Vehicle;
 
 @Service
 public class VehicleService {
+	
+	private static final Logger logger = LoggerFactory.getLogger(VehicleService.class);
 	
 	@Value("${br.com.danilopaixao.service.vehicle.url}")
 	private String vehicleRestApiUrl;
@@ -37,8 +41,9 @@ public class VehicleService {
 	public Vehicle getVehicle(final String vin) {
 		return restTemplate.getForObject(vehicleRestApiUrl+"/vehicles/"+vin, Vehicle.class);
 	}
-	public Vehicle getVehicleFallBack(final String id) {
-		return new Vehicle("UNAVAILABLE", "", "", null, "");
+	public Vehicle getVehicleFallBack(final String vin) {
+		logger.error("error vehicle rest service ##VehicleService#getVehicleFallBack({})", vin);
+		return new Vehicle(vin, "NOTFOUND", "NOTFOUND", StatusEnum.OFF, "NOTFOUND");
 	}
 	
 	
@@ -60,6 +65,7 @@ public class VehicleService {
 		restTemplate.put(url, status.toString());
 	}
 	public void updateVehicleFallBack(final String vin, StatusEnum status) {
+		logger.error("error vehicle rest service ##VehicleService#updateVehicleFallBack({}, {})", vin, status);
 		//TODO: armazenar dados no Redis
 	}
 	

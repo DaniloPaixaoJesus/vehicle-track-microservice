@@ -2,24 +2,30 @@ spring:
   application:
     name: vehicle-track-service
   rabbitmq:
-    host: ${RABBIT_MQ_HOST:localhost}
+    addresses: chimpanzee.rmq.cloudamqp.com/zcdpcvpk
+    # host: ${RABBIT_MQ_HOST:chimpanzee.rmq.cloudamqp.com}
     port: ${RABBIT_MQ_PORT:5672} 
-    username: ${RABBIT_MQ_USER:swedqmq}
-    password: ${RABBIT_MQ_PASSWORD:swedqmq}
+    username: ${RABBIT_MQ_USER:zcdpcvpk}
+    password: ${RABBIT_MQ_PASSWORD:jYbSUveUBNCCYhXqYQg9OXDuLqaZe4Kr}
     listener:
       simple:
         concurrency: 3
         max-concurrency: 6
   redis:
-    url: redis://${REDIS_HOST:localhost}:${REDIS_PORT:6379}
+    url: redis://redispassword@localhost:19635
+    #url: redis://kN2CUQ0lVUmyPbNG9PbprtiOnvILRh9n@redis-19635.c52.us-east-1-4.ec2.cloud.redislabs.com:19635    #port: 19635
+    #host: redis-19635.c52.us-east-1-4.ec2.cloud.redislabs.com
+    #password: kN2CUQ0lVUmyPbNG9PbprtiOnvILRh9n
+    jedis:      pool:        max-active: 10
 queue:
   vehicle:
     track:
       name: VehicleTrackQueue 
 server:
-  port: 8084
+  port: 8080
 eureka:
   client:
+    enabled: false
     serviceUrl:
       defaultZone: http://${EUREKA_SERVER:localhost}:${EUREKA_PORT:8761}/eureka/
 br:
@@ -27,6 +33,11 @@ br:
     danilopaixao:
       service:
         vehicle:
+          url: http://vehicle-service/v1/
           protocol: http 
           host: vehicle-service
           version: v1
+#amqp://zcdpcvpk:jYbSUveUBNCCYhXqYQg9OXDuLqaZe4Kr@chimpanzee.rmq.cloudamqp.com/zcdpcvpk
+#redis-19635.c52.us-east-1-4.ec2.cloud.redislabs.com:19635
+#kN2CUQ0lVUmyPbNG9PbprtiOnvILRh9n@redis-19635.c52.us-east-1-4.ec2.cloud.redislabs.com:19635
+#redis://${REDIS_HOST:localhost}:${REDIS_PORT:6379}

@@ -42,7 +42,7 @@ public class VehicleTrackQueueConsumer {
         	if( vehicle == null
         			|| vehicle.getVin() == null
         			|| vehicle.getVin().isEmpty()) {
-        		logger.warn("###### VehicleTrackQueueConsumer# vehicle without VIN CODE");
+        		logger.warn("###### VehicleTrackQueueConsumer# vehicle notfoud, vin {}, ", vehicleTrackPayload.getVin(), vehicle);
         		return;
         	}
       		

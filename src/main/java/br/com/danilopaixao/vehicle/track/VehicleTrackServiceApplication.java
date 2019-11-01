@@ -39,32 +39,17 @@ public class VehicleTrackServiceApplication {
 	@LoadBalanced
 	public RestTemplate getRestTemplate() {
 		return new RestTemplate();
-//		HttpComponentsClientHttpRequestFactory clientHttpRequestFactory = new HttpComponentsClientHttpRequestFactory();
-//		clientHttpRequestFactory.setConnectTimeout(2000);
-//		return new RestTemplate(clientHttpRequestFactory);
 	}
     
-    /**
-       	redis:
-    		url: redis://${REDIS_HOST:localhost}:${REDIS_PORT:6379}
-    	
-    	  redis:
-		    host: ${REDIS_HOST:localhost}
-		    port: ${REDIS_PORT:6379}
-     * @return
-     */
+    //redis://kN2CUQ0lVUmyPbNG9PbprtiOnvILRh9n@redis-19635.c52.us-east-1-4.ec2.cloud.redislabs.com:19635
     @Bean
-    public JedisConnectionFactory jedisConnectionFactory() {
-        return new JedisConnectionFactory();
+    JedisConnectionFactory jedisConnectionFactory() {
+        JedisConnectionFactory jedisConFactory = new JedisConnectionFactory();
+//        jedisConFactory.setHostName("redis-19635.c52.us-east-1-4.ec2.cloud.redislabs.com");
+//        jedisConFactory.setPort(19635);
+//        jedisConFactory.setPassword("kN2CUQ0lVUmyPbNG9PbprtiOnvILRh9n");
+        return jedisConFactory;
     }
-    
-//    @Bean
-//    JedisConnectionFactory jedisConnectionFactory() {
-//        JedisConnectionFactory jedisConFactory = new JedisConnectionFactory();
-//        jedisConFactory.setHostName("redis://redis:6379");
-//        jedisConFactory.setPort(6379);
-//        return jedisConFactory;
-//    }
      
     @Bean
     public RedisTemplate<String, Object> redisTemplate() {

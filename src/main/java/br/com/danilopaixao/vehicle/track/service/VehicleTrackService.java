@@ -1,7 +1,7 @@
 package br.com.danilopaixao.vehicle.track.service;
 
 import java.util.Date;
-import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,7 +11,6 @@ import org.springframework.stereotype.Service;
 import br.com.danilopaixao.vehicle.track.enums.StatusEnum;
 import br.com.danilopaixao.vehicle.track.model.VehicleTrack;
 import br.com.danilopaixao.vehicle.track.queue.VehicleTrackQueueSender;
-import br.com.danilopaixao.vehicle.track.repository.VehicleTrackMapRepository;
 import br.com.danilopaixao.vehicle.track.repository.VehicleTrackRepository;
 
 @Service
@@ -22,8 +21,8 @@ public class VehicleTrackService {
 	@Autowired
 	private VehicleTrackRepository vehicleTrackRepository;
 	
-	@Autowired
-	private VehicleTrackMapRepository vehicleTrackMapRepository;
+//	@Autowired
+//	private VehicleTrackMapRepository vehicleTrackMapRepository;
 	
 	@Autowired
 	private VehicleTrackQueueSender vehicleTrackQueueSender;
@@ -37,11 +36,12 @@ public class VehicleTrackService {
 	
 	@Scheduled(cron = "0/59 * * * * ?")
 	public void processOffLineVehicle() {
-		logger.info("##Execution offline vehicle routine");
-		List<VehicleTrack> cache = vehicleTrackMapRepository.getAll();
+		Iterable<VehicleTrack> cache = vehicleTrackRepository.findAll();
 		if(cache == null) {
+			logger.info("##Execution offline vehicle routine: NO VEHICLE");
 			return;
 		}
+		logger.info("##Execution offline vehicle routine: {}", cache);
 		cache.forEach(tracker -> {
 				if(tracker.getStatus() == StatusEnum.ON) {
 					if(setOffLineVehicle(tracker.getDtStatus())) {
@@ -61,19 +61,10 @@ public class VehicleTrackService {
 				return true;
 			}
 			Date d2 = new Date();
-			//in milliseconds
 			long diff = d2.getTime() - lastChangeStatus.getTime();
-
-//			long diffSeconds = diff / 1000 % 60;
 			long diffMinutes = diff / (60 * 1000) % 60;
 			long diffHours = diff / (60 * 60 * 1000) % 24;
 			long diffDays = diff / (24 * 60 * 60 * 1000);
-
-//			System.out.print(diffDays + " days, ");
-//			System.out.print(diffHours + " hours, ");
-//			System.out.print(diffMinutes + " minutes, ");
-//			System.out.print(diffSeconds + " seconds.");
-			
 			if(diffDays == 0L
 					&& diffHours == 0L
 					&& diffMinutes < 1L
@@ -82,7 +73,6 @@ public class VehicleTrackService {
 			}else {
 				return true;
 			}
-
 		} catch (Exception e) {
 			e.printStackTrace();
 			return true;
@@ -97,20 +87,21 @@ public class VehicleTrackService {
 	
 	public VehicleTrack insertVehicleTrack(VehicleTrack vehicleTrack) {
 		logger.info("##VehicleTrackService##insertVehicleTrack: {}", vehicleTrack.getVin());
-		return vehicleTrackMapRepository.put(vehicleTrack.getVin(), vehicleTrack);
+		return vehicleTrackRepository.save(vehicleTrack);
 	}
 	
 	public VehicleTrack getVehicleTrack(String vin) {
 		logger.info("##VehicleTrackService##getVehicleTrack: {}", vin);
-		return vehicleTrackMapRepository.get(vin);
+		//TODO: use Optional class
+		return vehicleTrackRepository.findById(vin).orElse(null);
 	}
 	
-	public List<VehicleTrack> getAllVehicleTrack() {
-		return vehicleTrackMapRepository.getAll();
+	public Iterable<VehicleTrack> getAllVehicleTrack() {
+		return vehicleTrackRepository.findAll();
 	}
 
 	public VehicleTrack updateVehicleTrack(VehicleTrack vehicleTrack) {
 		logger.info("##VehicleTrackService##updateVehicleTrack: {}/{}", vehicleTrack.getVin(), vehicleTrack.getStatus());
-		return vehicleTrackMapRepository.save(vehicleTrack);
+		return vehicleTrackRepository.save(vehicleTrack);
 	}
 }
