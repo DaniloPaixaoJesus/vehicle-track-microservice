@@ -21,9 +21,6 @@ public class VehicleTrackService {
 	@Autowired
 	private VehicleTrackRepository vehicleTrackRepository;
 	
-//	@Autowired
-//	private VehicleTrackMapRepository vehicleTrackMapRepository;
-	
 	@Autowired
 	private VehicleTrackQueueSender vehicleTrackQueueSender;
 	

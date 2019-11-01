@@ -14,8 +14,6 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.web.client.RestTemplate;
 
-import br.com.danilopaixao.vehicle.track.repository.VehicleTrackMapRepository;
-
 @SpringBootApplication
 @EnableDiscoveryClient
 @EnableCircuitBreaker
@@ -28,11 +26,6 @@ public class VehicleTrackServiceApplication {
 
     public static void main(String[] args) {
         SpringApplication.run(VehicleTrackServiceApplication.class, args);
-    }
-    
-    @Bean
-    public VehicleTrackMapRepository getVehicleTrackerMapRepository() {
-    	return new VehicleTrackMapRepository();
     }
     
     @Bean
