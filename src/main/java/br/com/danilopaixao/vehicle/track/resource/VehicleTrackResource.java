@@ -25,10 +25,10 @@ public class VehicleTrackResource {
 	@Autowired
 	private VehicleTrackService service;
 	
-	@RequestMapping(value = "/redis-test")
+	@RequestMapping(value = "/")
 	@ResponseStatus(HttpStatus.OK)
-	public Iterable<VehicleTrack> redisTest() {
-		return service.testRedis();
+	public Iterable<VehicleTrack> findAll() {
+		return service.findAll();
 	}
 	
 	@RequestMapping(value = "/queue", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)

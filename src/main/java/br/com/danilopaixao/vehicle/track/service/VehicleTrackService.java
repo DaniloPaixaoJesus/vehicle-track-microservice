@@ -27,10 +27,6 @@ public class VehicleTrackService {
 	@Autowired
 	private VehicleService vehicleService;
 	
-	public Iterable<VehicleTrack> testRedis() {
-		return vehicleTrackRepository.findAll();
-	}
-	
 	@Scheduled(cron = "0/59 * * * * ?")
 	public void processOffLineVehicle() {
 		Iterable<VehicleTrack> cache = vehicleTrackRepository.findAll();
@@ -91,6 +87,10 @@ public class VehicleTrackService {
 		logger.info("##VehicleTrackService##getVehicleTrack: {}", vin);
 		//TODO: use Optional class
 		return vehicleTrackRepository.findById(vin).orElse(null);
+	}
+	
+	public Iterable<VehicleTrack> findAll() {
+		return vehicleTrackRepository.findAll();
 	}
 	
 	public Iterable<VehicleTrack> getAllVehicleTrack() {
