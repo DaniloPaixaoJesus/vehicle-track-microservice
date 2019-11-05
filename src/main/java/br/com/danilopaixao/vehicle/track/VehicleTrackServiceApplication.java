@@ -38,9 +38,9 @@ public class VehicleTrackServiceApplication {
     @Bean
     JedisConnectionFactory jedisConnectionFactory() {
         JedisConnectionFactory jedisConFactory = new JedisConnectionFactory();
-//        jedisConFactory.setHostName("redis-19635.c52.us-east-1-4.ec2.cloud.redislabs.com");
-//        jedisConFactory.setPort(19635);
-//        jedisConFactory.setPassword("kN2CUQ0lVUmyPbNG9PbprtiOnvILRh9n");
+        jedisConFactory.setHostName("redis-19635.c52.us-east-1-4.ec2.cloud.redislabs.com");
+        jedisConFactory.setPort(19635);
+        jedisConFactory.setPassword("kN2CUQ0lVUmyPbNG9PbprtiOnvILRh9n");
         return jedisConFactory;
     }
      
