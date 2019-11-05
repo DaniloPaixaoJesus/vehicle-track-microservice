@@ -8,6 +8,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -25,16 +26,18 @@ public class VehicleTrackResource {
 	@Autowired
 	private VehicleTrackService service;
 	
-	@RequestMapping(value = "/")
+	@GetMapping(value="/", 
+				produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
 	@ResponseStatus(HttpStatus.OK)
 	public Iterable<VehicleTrack> findAll() {
 		return service.findAll();
 	}
 	
-	@RequestMapping(value = "/queue", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+	@GetMapping(value = "/queue/{vin}", 
+				produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
 	@ResponseStatus(HttpStatus.OK)
-	public Iterable<VehicleTrack> getVehicleTrack() {
-		return service.getAllVehicleTrack();
+	public VehicleTrack getVehicleTrack(@PathVariable("vin") final String vin) {
+		return service.getVehicleTrack(vin);
 	}
 	
 	
@@ -49,7 +52,7 @@ public class VehicleTrackResource {
 			return new ResponseEntity<VehicleTrack>(null, null, HttpStatus.NOT_FOUND);
 		}
 		
-		String locationHeader = "/api/v1/vehicle-track/"+vehicleTrack.getVin()+"/queue";
+		String locationHeader = "/api/v1/vehicle-track/queue/"+vehicleTrack.getVin();
 		header.put("Location", Arrays.asList(locationHeader));
 		
 		return new ResponseEntity<VehicleTrack>(vehicleTrack, header, HttpStatus.ACCEPTED);

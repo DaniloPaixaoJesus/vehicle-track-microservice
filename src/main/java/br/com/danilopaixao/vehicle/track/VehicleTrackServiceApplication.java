@@ -9,6 +9,8 @@ import org.springframework.cloud.client.circuitbreaker.EnableCircuitBreaker;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 import org.springframework.cloud.client.loadbalancer.LoadBalanced;
 import org.springframework.context.annotation.Bean;
+import org.springframework.data.redis.connection.RedisPassword;
+import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
 import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.scheduling.annotation.EnableScheduling;
@@ -23,6 +25,15 @@ public class VehicleTrackServiceApplication {
 	
 	@Value("${queue.vehicle.track.name}")
     private String vehicleTrackQueue;
+	
+	@Value("${spring.redis.host}")
+    private String HOST;
+	
+	@Value("${spring.redis.port}")
+    private int PORT;
+	
+	@Value("${spring.redis.password}")
+    private String PASSWORD;
 
     public static void main(String[] args) {
         SpringApplication.run(VehicleTrackServiceApplication.class, args);
@@ -34,14 +45,20 @@ public class VehicleTrackServiceApplication {
 		return new RestTemplate();
 	}
     
-    //redis://kN2CUQ0lVUmyPbNG9PbprtiOnvILRh9n@redis-19635.c52.us-east-1-4.ec2.cloud.redislabs.com:19635
-    @Bean
+    @SuppressWarnings("deprecation")
+	@Bean
     JedisConnectionFactory jedisConnectionFactory() {
         JedisConnectionFactory jedisConFactory = new JedisConnectionFactory();
-        jedisConFactory.setHostName("redis-19635.c52.us-east-1-4.ec2.cloud.redislabs.com");
-        jedisConFactory.setPort(19635);
-        jedisConFactory.setPassword("kN2CUQ0lVUmyPbNG9PbprtiOnvILRh9n");
+        jedisConFactory.setHostName(HOST);
+        jedisConFactory.setPort(PORT);
+        jedisConFactory.setPassword(PASSWORD);
         return jedisConFactory;
+    }
+    
+    JedisConnectionFactory jedisConnectionFactoryNoDeprecated() {
+        RedisStandaloneConfiguration redisStandaloneConfiguration = new RedisStandaloneConfiguration(HOST, PORT);
+        redisStandaloneConfiguration.setPassword(RedisPassword.of(PASSWORD));
+        return new JedisConnectionFactory(redisStandaloneConfiguration);
     }
      
     @Bean

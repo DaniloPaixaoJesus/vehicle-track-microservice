@@ -5,6 +5,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 import org.springframework.web.client.RestTemplate;
 
 import com.netflix.hystrix.contrib.javanica.annotation.HystrixCommand;
@@ -39,6 +40,9 @@ public class VehicleService {
 			}
 	)
 	public Vehicle getVehicle(final String vin) {
+		if(StringUtils.isEmpty(vin)) {
+			return null;
+		}
 		return restTemplate.getForObject(vehicleRestApiUrl+"/vehicles/"+vin, Vehicle.class);
 	}
 	public Vehicle getVehicleFallBack(final String vin) {
@@ -61,12 +65,17 @@ public class VehicleService {
 			}
 	)
 	public void updateVehicle(final String vin, StatusEnum status) {
+		if(StringUtils.isEmpty(vin)
+				|| StringUtils.isEmpty(status)) {
+			logger.error("invalid argument ##VehicleService#updateVehicle({}, {})", vin, status);
+			throw new IllegalArgumentException("");
+		}
+		logger.info("##VehicleService#updateVehicle({}, {})", vin, status);
 		String url = vehicleRestApiUrl+"/vehicles/"+vin+"/status";
 		restTemplate.put(url, status.toString());
 	}
 	public void updateVehicleFallBack(final String vin, StatusEnum status) {
 		logger.error("error vehicle rest service ##VehicleService#updateVehicleFallBack({}, {})", vin, status);
-		//TODO: armazenar dados no Redis
 	}
 	
 }

@@ -1,4 +1,4 @@
-package br.com.danilopaixao.vehicle.track;
+package br.com.danilopaixao.vehicle.test;
 import com.lambdaworks.redis.*;
 
 public class RedisLabTest {
