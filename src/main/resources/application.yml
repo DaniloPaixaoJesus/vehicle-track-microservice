@@ -3,7 +3,6 @@ spring:
     name: vehicle-track-service
   rabbitmq:
     addresses: ${RABBIT_MQ_ADDRESS:chimpanzee.rmq.cloudamqp.com/zcdpcvpk}
-    # host: ${RABBIT_MQ_HOST:chimpanzee.rmq.cloudamqp.com}
     port: ${RABBIT_MQ_PORT:5672} 
     username: ${RABBIT_MQ_USER:zcdpcvpk}
     password: ${RABBIT_MQ_PASSWORD:jYbSUveUBNCCYhXqYQg9OXDuLqaZe4Kr}
@@ -19,7 +18,7 @@ spring:
 queue:
   vehicle:
     track:
-      name: VehicleTrackQueue 
+      name: ${VEHICLE_TRACK_QUEUE:VehicleTrackQueue} 
 server:
   port: 8080
 eureka:
@@ -32,4 +31,4 @@ br:
     danilopaixao:
       service:
         vehicle:
-          url: http://vehicle-service/v1/
+          url: ${VEHICLE_SERVICE_URL:http://vehicle-service/v1/}
