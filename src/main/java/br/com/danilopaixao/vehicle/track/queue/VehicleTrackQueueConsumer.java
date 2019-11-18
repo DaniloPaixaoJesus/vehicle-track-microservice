@@ -1,11 +1,12 @@
 package br.com.danilopaixao.vehicle.track.queue;
 
-import java.util.Date;
+import java.time.ZonedDateTime;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.stereotype.Component;
 
@@ -27,6 +28,9 @@ public class VehicleTrackQueueConsumer {
 	
 	@Autowired
 	private VehicleTrackService vehicleTrackService;
+	
+	@Value("${queue.vehicle.track.name}")
+	private String queueVehicleTrackName;
 	
     @RabbitListener(queues = {"${queue.vehicle.track.name}"})
     public void receive(@Payload String payload) {
@@ -50,7 +54,7 @@ public class VehicleTrackQueueConsumer {
       		
         	if (vehicleTrackCache == null) {
         		logger.info("###### VehicleTrackQueueConsumer#receive - insert cache database first time: {}", vehicleTrackPayload.getVin());
-        		vehicleTrackCache = new VehicleTrack(vehicleTrackPayload.getVin(), "", StatusEnum.ON, new Date());
+        		vehicleTrackCache = new VehicleTrack(vehicleTrackPayload.getVin(), queueVehicleTrackName, StatusEnum.ON, ZonedDateTime.now(), null);
         		vehicleTrackService.insertVehicleTrack(vehicleTrackCache);
         		vehicleService.updateVehicle(vehicleTrackPayload.getVin(), StatusEnum.ON);
         	}else if (vehicleTrackCache.getStatus() == StatusEnum.OFF){

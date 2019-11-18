@@ -1,6 +1,6 @@
 package br.com.danilopaixao.vehicle.track.queue;
 
-import java.util.Date;
+import java.time.ZonedDateTime;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,7 +34,7 @@ public class VehicleTrackQueueSender {
     	logger.info("###### VehicleTrackQueueSender#sendQueue:{}", vin);
     	
     	ObjectMapper jsonMapper = new ObjectMapper();
-    	VehicleTrack vehicleTrack = new VehicleTrack(vin, vehicleTrackQueueName, StatusEnum.ON, new Date());
+    	VehicleTrack vehicleTrack = new VehicleTrack(vin, vehicleTrackQueueName, StatusEnum.ON, ZonedDateTime.now(), null);
     	 String payload = jsonMapper.writeValueAsString(vehicleTrack);
         rabbitTemplate.convertAndSend(this.queue.getName(), payload);
         return vehicleTrack;

@@ -1,10 +1,11 @@
 package br.com.danilopaixao.vehicle.track.service;
 
-import java.util.Date;
+import java.time.ZonedDateTime;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
@@ -17,6 +18,9 @@ import br.com.danilopaixao.vehicle.track.repository.VehicleTrackRepository;
 public class VehicleTrackService {
 	
 	private static final Logger logger = LoggerFactory.getLogger(VehicleTrackService.class);	
+	
+	@Value("${br.com.danilopaixao.vehicle.track.secondstooffline}")
+	private int secondsToOfffline;
 	
 	@Autowired
 	private VehicleTrackRepository vehicleTrackRepository;
@@ -37,40 +41,15 @@ public class VehicleTrackService {
 		logger.info("##Execution offline vehicle routine: {}", cache);
 		cache.forEach(tracker -> {
 				if(tracker.getStatus() == StatusEnum.ON) {
-					if(setOffLineVehicle(tracker.getDtStatus())) {
+					if(tracker.isOffLineVehicle(secondsToOfffline)) {
 						logger.info("vin status OFF:"+tracker.getVin());
 						tracker.setStatus(StatusEnum.OFF);
-						tracker.setDtStatus(new Date());
+						tracker.setDtStatus(ZonedDateTime.now());
 						this.updateVehicleTrack(tracker);
 						vehicleService.updateVehicle(tracker.getVin(), StatusEnum.OFF);
 					}
 				}
 			});
-	}
-	
-	public boolean setOffLineVehicle(Date lastChangeStatus) {
-		try {
-			if(lastChangeStatus == null) {
-				return true;
-			}
-			Date d2 = new Date();
-			long diff = d2.getTime() - lastChangeStatus.getTime();
-			long diffMinutes = diff / (60 * 1000) % 60;
-			long diffHours = diff / (60 * 60 * 1000) % 24;
-			long diffDays = diff / (24 * 60 * 60 * 1000);
-			if(diffDays == 0L
-					&& diffHours == 0L
-					&& diffMinutes < 1L
-					) {
-				return false;
-			}else {
-				return true;
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-			return true;
-		}
-
 	}
 	
 	public VehicleTrack insertIntoQueueOnlineStatus(String vin) throws Throwable {

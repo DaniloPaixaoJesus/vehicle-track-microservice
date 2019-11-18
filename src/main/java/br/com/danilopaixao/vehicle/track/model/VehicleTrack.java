@@ -1,12 +1,15 @@
 package br.com.danilopaixao.vehicle.track.model;
 
 import java.io.Serializable;
-import java.util.Date;
+import java.time.ZonedDateTime;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.redis.core.RedisHash;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import br.com.danilopaixao.vehicle.track.enums.StatusEnum;
+import br.com.danilopaixao.vehicle.track.utils.DateTimeUtils;
 
 @RedisHash("VehicleTrack")
 public class VehicleTrack implements Serializable {
@@ -20,17 +23,26 @@ public class VehicleTrack implements Serializable {
 	private String vin;
 	private String queue;
 	private StatusEnum status;
-	private Date dtStatus;
+	@JsonIgnore
+	private ZonedDateTime dtStatus;
+	@JsonIgnore
+	private ZonedDateTime dtIniStatus;
 
 	public VehicleTrack() {
 	}
 
-	public VehicleTrack(String vin, String queue, StatusEnum status, Date dtStatus) {
+	public VehicleTrack(String vin, String queue, StatusEnum status, ZonedDateTime dtStatus, ZonedDateTime dtIniStatus) {
 		super();
 		this.vin = vin;
 		this.queue = queue;
 		this.status = status;
 		this.dtStatus = dtStatus;
+		this.dtIniStatus = dtIniStatus;
+	}
+	
+	public boolean isOffLineVehicle(int seconds) {
+		long diff = DateTimeUtils.secsDiff(dtStatus, ZonedDateTime.now());
+		return diff > seconds ? Boolean.TRUE : Boolean.FALSE;
 	}
 
 	public String getVin() {
@@ -57,12 +69,20 @@ public class VehicleTrack implements Serializable {
 		this.status = status;
 	}
 
-	public Date getDtStatus() {
+	public ZonedDateTime getDtStatus() {
 		return dtStatus;
 	}
 
-	public void setDtStatus(Date dtStatus) {
+	public void setDtStatus(ZonedDateTime dtStatus) {
 		this.dtStatus = dtStatus;
+	}
+
+	public ZonedDateTime getDtIniStatus() {
+		return dtIniStatus;
+	}
+
+	public void setDtIniStatus(ZonedDateTime dtIniStatus) {
+		this.dtIniStatus = dtIniStatus;
 	}
 
 	@Override

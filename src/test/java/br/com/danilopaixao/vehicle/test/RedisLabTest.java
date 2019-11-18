@@ -7,7 +7,7 @@ public class RedisLabTest {
 	    
 		//redis://kN2CUQ0lVUmyPbNG9PbprtiOnvILRh9n@redis-19635.c52.us-east-1-4.ec2.cloud.redislabs.com:19635
 		RedisClient redisClient = new RedisClient(
-	    RedisURI.create("redis://kN2CUQ0lVUmyPbNG9PbprtiOnvILRh9n@redis-19635.c52.us-east-1-4.ec2.cloud.redislabs.com:19635"));
+	    RedisURI.create("redis://kN2CUQ0lVUmyPbNG9PbprtiOnvILRh9n@localhost:6379"));
 	    RedisConnection<String, String> connection = redisClient.connect();
 
 	    System.out.println("Connected to Redis");

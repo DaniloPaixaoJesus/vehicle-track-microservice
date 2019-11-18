@@ -1,4 +1,8 @@
 spring:
+  jackson:
+    date-format: yyyy-MM-dd'T'HH:mm:ss.SSSZ
+    serialization:      write-dates-as-timestamps: false
+      WRITE_DATES_AS_TIMESTAMPS: false
   application:
     name: vehicle-track-service
   rabbitmq:
@@ -10,9 +14,9 @@ spring:
       simple:
         concurrency: 3
         max-concurrency: 6
-  redis:
-    port: ${REDIS_PORT:19635}
-    host: ${REDIS_HOST:redis-19635.c52.us-east-1-4.ec2.cloud.redislabs.com}
+  redis: #19635
+    port: ${REDIS_PORT:6379}
+    host: ${REDIS_HOST:localhost}
     password: ${REDIS_PASSWORD:kN2CUQ0lVUmyPbNG9PbprtiOnvILRh9n}
     jedis:      pool:        max-active: 10
 queue:
@@ -29,6 +33,11 @@ eureka:
 br:
   com:
     danilopaixao:
+      vehicle:
+        track:
+          secondstooffline: 60
+      validator:
+        timelimiteminutes: 240 
       service:
         vehicle:
           url: ${VEHICLE_SERVICE_URL:http://vehicle-service/v1/}

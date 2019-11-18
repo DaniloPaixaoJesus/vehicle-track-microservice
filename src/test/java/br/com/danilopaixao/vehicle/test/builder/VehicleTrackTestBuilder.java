@@ -1,8 +1,6 @@
 package br.com.danilopaixao.vehicle.test.builder;
 
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.util.Date;
+import java.time.ZonedDateTime;
 
 import org.apache.commons.lang.RandomStringUtils;
 
@@ -14,30 +12,46 @@ public class VehicleTrackTestBuilder {
 	private String vin;
 	private String queue;
 	private StatusEnum status;
-	private Date dtStatus;
-	private LocalDateTime dateTime = LocalDateTime.now();;
+	private ZonedDateTime dtStatus;
+	private ZonedDateTime dtIniStatus;
+	private ZonedDateTime dateTime = ZonedDateTime.now();;
 	
-	public VehicleTrack buildRandom(int minBefore, StatusEnum status) {
+	public VehicleTrack build() {
+		return new VehicleTrack(vin, queue, status, dtStatus, dtIniStatus);
+	}
+	
+	public VehicleTrack buildRandom(int minBefore, int minIniBefore, StatusEnum status) {
 		return new VehicleTrack(RandomStringUtils.random(25, true, true), 
 						   RandomStringUtils.random(15, true, false),
 						   status,
-						   Date.from(dateTime.plusMinutes(minBefore).atZone(ZoneId.systemDefault()).toInstant()));
+						   dateTime.plusMinutes(minBefore),
+						   dateTime.plusMinutes(minIniBefore)
+						   );
 	}
 	
-	public void setVin(String vin) {
+	public VehicleTrackTestBuilder setVin(String vin) {
 		this.vin = vin;
+		return this;
 	}
 
-	public void setQueue(String queue) {
+	public VehicleTrackTestBuilder setQueue(String queue) {
 		this.queue = queue;
+		return this;
 	}
 
-	public void setStatus(StatusEnum status) {
+	public VehicleTrackTestBuilder setStatus(StatusEnum status) {
 		this.status = status;
+		return this;
 	}
 
-	public void setDtStatus(Date dtStatus) {
+	public VehicleTrackTestBuilder setDtStatus(ZonedDateTime dtStatus) {
 		this.dtStatus = dtStatus;
+		return this;
+	}
+	
+	public VehicleTrackTestBuilder setDtIniStatus(ZonedDateTime dtIniStatus) {
+		this.dtIniStatus = dtIniStatus;
+		return this;
 	}
 
 	
