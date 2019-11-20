@@ -14,10 +14,10 @@ spring:
       simple:
         concurrency: 3
         max-concurrency: 6
-  redis: #19635
-    port: ${REDIS_PORT:6379}
-    host: ${REDIS_HOST:localhost}
-    password: ${REDIS_PASSWORD:kN2CUQ0lVUmyPbNG9PbprtiOnvILRh9n}
+  redis:
+    port: ${REDIS_PORT:10508}
+    host: ${REDIS_HOST:redis-10508.c9.us-east-1-4.ec2.cloud.redislabs.com}
+    password: ${REDIS_PASSWORD:aH9WHGiUkpBOoZHF46kciNl1p6eNirEW}
     jedis:      pool:        max-active: 10
 queue:
   vehicle:

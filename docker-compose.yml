@@ -1,0 +1,58 @@
+version: '2'
+services:
+    rabbitmq:
+        hostname: rabbitmq
+        build:
+            context: .
+            dockerfile: rabbitmq.Dockerfile
+        environment:
+            RABBITMQ_DEFAULT_USER: "admin"
+            RABBITMQ_DEFAULT_PASS: "123456"
+        ports:
+        - 15672:15672
+        - 5672:5672
+        networks:
+            - microservice-network
+    redisdb:
+        image: 'redis:4-alpine'
+        hostname: redisdb
+        container_name: redisdb
+        environment:
+        # ALLOW_EMPTY_PASSWORD is recommended only for development.
+        - ALLOW_EMPTY_PASSWORD=yes
+        - REDIS_DISABLE_COMMANDS=FLUSHDB,FLUSHALL
+        ports:
+        - '6379:6379'
+        networks:
+        - microservice-network
+    vehicle-track:
+        container_name: vehicle-track
+        build:
+            dockerfile: ./vehicle.track.dockerfile
+            context: .
+        environment:
+            - REDIS_HOST=redisdb
+            - REDIS_PORT=6379
+            - REDIS_PASSWORD=
+            - RABBIT_MQ_ADDRESS=rabbitmq
+            - RABBIT_MQ_USER=admin
+            - RABBIT_MQ_PASSWORD=123456
+            - RABBIT_MQ_PORT=5672
+            - VEHICLE_TRACK_QUEUE=VehicleTrackQueue
+            - EUREKA_SERVER=eureka-server
+            - EUREKA_PORT=8761
+            - ENABLED_EUREKA=false
+            - VEHICLE_SERVICE_URL=http://vehicle-service/v1/
+        ports:
+            - 8084:8080
+        depends_on: 
+            - redisdb
+            - rabbitmq
+        links:
+            - "redisdb"
+            - "rabbitmq"
+        networks:
+            - microservice-network
+networks: 
+    microservice-network:
+        driver: bridge

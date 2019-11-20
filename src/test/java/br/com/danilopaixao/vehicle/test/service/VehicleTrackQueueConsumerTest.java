@@ -6,8 +6,6 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import java.time.ZonedDateTime;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -90,13 +88,7 @@ public class VehicleTrackQueueConsumerTest {
 		VehicleTrack vehicleTrackPayload = vehicleTrackBuilder.setVin(vehicleFound.getVin()).build();
 		vehicleTrackQueueConsumer.receive(getJson(vehicleTrackPayload));
 		
-		verify(vehicleTrackService, times(1)).insertVehicleTrack(new VehicleTrackTestBuilder()
-																		.setVin(vehicleTrackPayload.getVin())
-																		.setQueue(queueVehicleTrackName)
-																		.setDtStatus(ZonedDateTime.now())
-																		.setDtIniStatus(null)
-																		.setStatus(StatusEnum.ON)
-																		.build());
+		verify(vehicleTrackService, times(1)).insertVehicleTrack(any(VehicleTrack.class));
 		verify(vehicleService, times(1)).updateVehicle(vehicleTrackPayload.getVin(), StatusEnum.ON);
 		verify(vehicleService, times(0)).updateVehicle(vehicleTrackPayload.getVin(), StatusEnum.OFF);
 		verify(vehicleTrackService, times(0)).updateVehicleTrack(any(VehicleTrack.class));
