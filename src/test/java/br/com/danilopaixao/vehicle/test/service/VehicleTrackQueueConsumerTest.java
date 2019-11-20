@@ -23,6 +23,7 @@ import br.com.danilopaixao.vehicle.track.model.Vehicle;
 import br.com.danilopaixao.vehicle.track.model.VehicleTrack;
 import br.com.danilopaixao.vehicle.track.queue.VehicleTrackQueueConsumer;
 import br.com.danilopaixao.vehicle.track.service.VehicleService;
+import br.com.danilopaixao.vehicle.track.service.VehicleSocketService;
 import br.com.danilopaixao.vehicle.track.service.VehicleTrackService;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -36,6 +37,9 @@ public class VehicleTrackQueueConsumerTest {
 	
 	@Mock
 	private VehicleTrackService vehicleTrackService;
+	
+	@Mock
+	private VehicleSocketService vehicleSocketService;
 	
 	private String queueVehicleTrackName = "nome-da-fila";
 	

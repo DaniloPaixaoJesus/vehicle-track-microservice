@@ -16,6 +16,7 @@ import br.com.danilopaixao.vehicle.track.enums.StatusEnum;
 import br.com.danilopaixao.vehicle.track.model.Vehicle;
 import br.com.danilopaixao.vehicle.track.model.VehicleTrack;
 import br.com.danilopaixao.vehicle.track.service.VehicleService;
+import br.com.danilopaixao.vehicle.track.service.VehicleSocketService;
 import br.com.danilopaixao.vehicle.track.service.VehicleTrackService;
  
 @Component
@@ -28,6 +29,9 @@ public class VehicleTrackQueueConsumer {
 	
 	@Autowired
 	private VehicleTrackService vehicleTrackService;
+	
+	@Autowired
+	private VehicleSocketService vehicleSocketService;
 	
 	@Value("${queue.vehicle.track.name}")
 	private String queueVehicleTrackName;
@@ -55,13 +59,15 @@ public class VehicleTrackQueueConsumer {
         	if (vehicleTrackCache == null) {
         		logger.info("###### VehicleTrackQueueConsumer#receive - insert cache database first time: {}", vehicleTrackPayload.getVin());
         		vehicleTrackCache = new VehicleTrack(vehicleTrackPayload.getVin(), queueVehicleTrackName, StatusEnum.ON, ZonedDateTime.now(), null);
-        		vehicleTrackService.insertVehicleTrack(vehicleTrackCache);
         		vehicleService.updateVehicle(vehicleTrackPayload.getVin(), StatusEnum.ON);
+        		vehicleTrackService.insertVehicleTrack(vehicleTrackCache);
+        		vehicleSocketService.updateStatusWebSocket(vehicleTrackPayload.getVin(), StatusEnum.ON);
         	}else if (vehicleTrackCache.getStatus() == StatusEnum.OFF){
         		logger.info("###### VehicleTrackQueueConsumer#receive - update cache database, vin {}, status {}", vehicleTrackPayload.getVin(), StatusEnum.ON);
         		vehicleTrackCache.setStatus(StatusEnum.ON);
-        		vehicleTrackService.updateVehicleTrack(vehicleTrackCache);
         		vehicleService.updateVehicle(vehicleTrackPayload.getVin(), StatusEnum.ON);
+        		vehicleTrackService.updateVehicleTrack(vehicleTrackCache);
+        		vehicleSocketService.updateStatusWebSocket(vehicleTrackPayload.getVin(), StatusEnum.ON);
         	}
         	logger.info("###### VehicleTrackQueueConsumer#receive: end of process");        	
 		} catch (Exception e) {
