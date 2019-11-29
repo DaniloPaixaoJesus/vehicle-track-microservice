@@ -4,15 +4,15 @@ import java.io.Serializable;
 import java.time.ZonedDateTime;
 
 import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.redis.core.RedisHash;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import br.com.danilopaixao.vehicle.track.enums.StatusEnum;
 import br.com.danilopaixao.vehicle.track.utils.DateTimeUtils;
 
-@Document("vehicleTrack")
-public class VehicleTrack implements Serializable {
+@RedisHash("VehicleTrack")
+public class VehicleTrackRedis implements Serializable {
 
 	/**
 	 * 
@@ -28,13 +28,13 @@ public class VehicleTrack implements Serializable {
 	@JsonIgnore
 	private ZonedDateTime dtIniStatus;
 	
-	//db.VehicleTrack.ensureIndex( { location: "2d" } );
+	//db.vehicleTrack.ensureIndex( { location: "2d" } );
 	private Location geolocation;
 
-	public VehicleTrack() {
+	public VehicleTrackRedis() {
 	}
 
-	public VehicleTrack(String vin, String queue, StatusEnum status, ZonedDateTime dtStatus, ZonedDateTime dtIniStatus, Location geolocation) {
+	public VehicleTrackRedis(String vin, String queue, StatusEnum status, ZonedDateTime dtStatus, ZonedDateTime dtIniStatus, Location geolocation) {
 		super();
 		this.vin = vin;
 		this.queue = queue;
@@ -90,13 +90,13 @@ public class VehicleTrack implements Serializable {
 	}
 	
 	public Location getGeolocation() {
-		return geolocation;
+		return this.geolocation;
 	}
 
-	public void setGeolocation(Location location) {
-		this.geolocation = location;
+	public void setGeolocation(Location geolocation) {
+		this.geolocation = geolocation;
 	}
-	
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -116,7 +116,7 @@ public class VehicleTrack implements Serializable {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		VehicleTrack other = (VehicleTrack) obj;
+		VehicleTrackRedis other = (VehicleTrackRedis) obj;
 		if (dtStatus == null) {
 			if (other.dtStatus != null)
 				return false;

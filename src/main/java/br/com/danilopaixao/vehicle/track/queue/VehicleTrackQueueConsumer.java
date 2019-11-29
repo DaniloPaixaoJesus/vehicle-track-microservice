@@ -14,7 +14,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import br.com.danilopaixao.vehicle.track.enums.StatusEnum;
 import br.com.danilopaixao.vehicle.track.model.Vehicle;
-import br.com.danilopaixao.vehicle.track.model.VehicleTrack;
+import br.com.danilopaixao.vehicle.track.model.VehicleTrackRedis;
 import br.com.danilopaixao.vehicle.track.service.VehicleService;
 import br.com.danilopaixao.vehicle.track.service.VehicleSocketService;
 import br.com.danilopaixao.vehicle.track.service.VehicleTrackService;
@@ -42,29 +42,38 @@ public class VehicleTrackQueueConsumer {
     	logger.info("###### VehicleTrackQueueConsumer#receive:{}", payload);
     	
     	ObjectMapper jsonMapper = new ObjectMapper();
-    	VehicleTrack vehicleTrackPayload = null;
+    	VehicleTrackRedis vehicleTrackPayload = null;
       	try {
-      		vehicleTrackPayload = jsonMapper.readValue(payload, VehicleTrack.class);
+      		vehicleTrackPayload = jsonMapper.readValue(payload, VehicleTrackRedis.class);
       		
-      		Vehicle vehicle = vehicleService.getVehicle(vehicleTrackPayload.getVin());
-        	if( vehicle == null
-        			|| vehicle.getVin() == null
-        			|| vehicle.getVin().isEmpty()) {
-        		logger.warn("###### VehicleTrackQueueConsumer# vehicle notfoud, vin {}", vehicleTrackPayload);
-        		return;
-        	}
+      		VehicleTrackRedis vehicleTrackCache = vehicleTrackService.getVehicleTrack(vehicleTrackPayload.getVin());
       		
-      		VehicleTrack vehicleTrackCache = vehicleTrackService.getVehicleTrack(vehicleTrackPayload.getVin());
+      		Vehicle vehicle = null;
+      		if(vehicleTrackCache == null) {
+      			vehicle = vehicleService.getVehicle(vehicleTrackPayload.getVin());
+      			if( vehicle == null
+            			|| vehicle.getVin() == null
+            			|| vehicle.getVin().isEmpty()) {
+            		logger.warn("###### VehicleTrackQueueConsumer# vehicle notfoud, vin {}", vehicleTrackPayload);
+            		return;
+            	}
+      		}
+        	
       		
         	if (vehicleTrackCache == null) {
         		logger.info("###### VehicleTrackQueueConsumer#receive - insert cache database first time: {}", vehicleTrackPayload.getVin());
-        		vehicleTrackCache = new VehicleTrack(vehicleTrackPayload.getVin(), queueVehicleTrackName, StatusEnum.ON, ZonedDateTime.now(), null);
+        		vehicleTrackCache = new VehicleTrackRedis(vehicleTrackPayload.getVin(), 
+        													queueVehicleTrackName, 
+        													StatusEnum.ON, 
+        													ZonedDateTime.now(), null, 
+        													vehicleTrackPayload.getGeolocation());
         		vehicleService.updateVehicle(vehicleTrackPayload.getVin(), StatusEnum.ON);
         		vehicleTrackService.insertVehicleTrack(vehicleTrackCache);
         		vehicleSocketService.updateStatusWebSocket(vehicleTrackPayload.getVin(), StatusEnum.ON);
         	}else if (vehicleTrackCache.getStatus() == StatusEnum.OFF){
         		logger.info("###### VehicleTrackQueueConsumer#receive - update cache database, vin {}, status {}", vehicleTrackPayload.getVin(), StatusEnum.ON);
         		vehicleTrackCache.setStatus(StatusEnum.ON);
+        		vehicleTrackCache.setGeolocation(vehicleTrackPayload.getGeolocation());
         		vehicleService.updateVehicle(vehicleTrackPayload.getVin(), StatusEnum.ON);
         		vehicleTrackService.updateVehicleTrack(vehicleTrackCache);
         		vehicleSocketService.updateStatusWebSocket(vehicleTrackPayload.getVin(), StatusEnum.ON);

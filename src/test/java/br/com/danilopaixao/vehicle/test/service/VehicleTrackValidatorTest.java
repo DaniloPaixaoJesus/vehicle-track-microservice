@@ -11,14 +11,14 @@ import org.mockito.internal.util.reflection.Whitebox;
 import org.mockito.junit.MockitoJUnitRunner;
 
 import br.com.danilopaixao.vehicle.test.builder.VehicleTrackTestBuilder;
-import br.com.danilopaixao.vehicle.track.model.VehicleTrack;
+import br.com.danilopaixao.vehicle.track.model.VehicleTrackRedis;
 import br.com.danilopaixao.vehicle.track.validator.Validator;
 import br.com.danilopaixao.vehicle.track.validator.VehicleTrackValidator;
 
 @RunWith(MockitoJUnitRunner.class)
 public class VehicleTrackValidatorTest {
 
-	Validator<VehicleTrack> validator = new VehicleTrackValidator();
+	Validator<VehicleTrackRedis> validator = new VehicleTrackValidator();
 	
 	@Test
 	public void testValidatorTimeLimiteNOk() throws Exception {

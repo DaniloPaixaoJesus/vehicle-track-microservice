@@ -19,8 +19,8 @@ import org.mockito.junit.MockitoJUnitRunner;
 
 import br.com.danilopaixao.vehicle.test.builder.VehicleTrackTestBuilder;
 import br.com.danilopaixao.vehicle.track.enums.StatusEnum;
-import br.com.danilopaixao.vehicle.track.model.VehicleTrack;
-import br.com.danilopaixao.vehicle.track.repository.VehicleTrackRepository;
+import br.com.danilopaixao.vehicle.track.model.VehicleTrackRedis;
+import br.com.danilopaixao.vehicle.track.repository.VehicleTrackRedisRepository;
 import br.com.danilopaixao.vehicle.track.service.VehicleService;
 import br.com.danilopaixao.vehicle.track.service.VehicleTrackService;
 
@@ -31,7 +31,7 @@ public class VehicleTrackServiceTest {
 	private VehicleTrackService vehicleTrackService;
 	
 	@Mock
-	private VehicleTrackRepository vehicleTrackRepository;
+	private VehicleTrackRedisRepository vehicleTrackRepository;
 	
 	@Mock
 	private VehicleService vehicleService;
@@ -48,7 +48,7 @@ public class VehicleTrackServiceTest {
 		int vehicleQuantity = 1;
 		int minDateTimeBefore = -2;
 		int minIniBefore = minDateTimeBefore * 10;
-		List<VehicleTrack> vehicleTrackListFound = this.getListVehicleTrackRandomVehicle(vehicleQuantity, 
+		List<VehicleTrackRedis> vehicleTrackListFound = this.getListVehicleTrackRandomVehicle(vehicleQuantity, 
 																					minDateTimeBefore, 
 																					minIniBefore, 
 																					StatusEnum.ON);
@@ -64,14 +64,14 @@ public class VehicleTrackServiceTest {
 		int vehicleQuantity = 1;
 		int minDateTimeBefore = -1;
 		int minIniBefore = minDateTimeBefore * 10;
-		List<VehicleTrack> vehicleTrackListFound = this.getListVehicleTrackRandomVehicle(vehicleQuantity, 
+		List<VehicleTrackRedis> vehicleTrackListFound = this.getListVehicleTrackRandomVehicle(vehicleQuantity, 
 				minDateTimeBefore, 
 				minIniBefore, 
 				StatusEnum.ON);
 		when(vehicleTrackRepository.findAll()).thenReturn(vehicleTrackListFound);
 		Whitebox.setInternalState(vehicleTrackService, "secondsToOfffline", 61);
 		vehicleTrackService.processOffLineVehicle();
-		verify(vehicleTrackRepository, times(0)).save(any(VehicleTrack.class));
+		verify(vehicleTrackRepository, times(0)).save(any(VehicleTrackRedis.class));
 		verify(vehicleService, times(0)).updateVehicle(any(String.class), any(StatusEnum.class));
 	}
 	
@@ -80,14 +80,14 @@ public class VehicleTrackServiceTest {
 		int vehicleQuantity = 1;
 		int minDateTimeBefore = -5;
 		int minIniBefore = minDateTimeBefore * 10;
-		List<VehicleTrack> vehicleTrackListFound = this.getListVehicleTrackRandomVehicle(vehicleQuantity, 
+		List<VehicleTrackRedis> vehicleTrackListFound = this.getListVehicleTrackRandomVehicle(vehicleQuantity, 
 				minDateTimeBefore, 
 				minIniBefore, 
 				StatusEnum.OFF);
 		when(vehicleTrackRepository.findAll()).thenReturn(vehicleTrackListFound);
 		Whitebox.setInternalState(vehicleTrackService, "secondsToOfffline", 60);
 		vehicleTrackService.processOffLineVehicle();
-		verify(vehicleTrackRepository, times(0)).save(any(VehicleTrack.class));
+		verify(vehicleTrackRepository, times(0)).save(any(VehicleTrackRedis.class));
 		verify(vehicleService, times(0)).updateVehicle(any(String.class), any(StatusEnum.class));
 	}
 	
@@ -96,12 +96,12 @@ public class VehicleTrackServiceTest {
 		when(vehicleTrackRepository.findAll()).thenReturn(null);
 		Whitebox.setInternalState(vehicleTrackService, "secondsToOfffline", 60);
 		vehicleTrackService.processOffLineVehicle();
-		verify(vehicleTrackRepository, times(0)).save(any(VehicleTrack.class));
+		verify(vehicleTrackRepository, times(0)).save(any(VehicleTrackRedis.class));
 		verify(vehicleService, times(0)).updateVehicle(any(String.class), any(StatusEnum.class));
 	}
 	
-	private List<VehicleTrack> getListVehicleTrackRandomVehicle(int quantity, int minBefore, int minIniBefore, StatusEnum status){
-		List<VehicleTrack> r = new ArrayList<VehicleTrack>();
+	private List<VehicleTrackRedis> getListVehicleTrackRandomVehicle(int quantity, int minBefore, int minIniBefore, StatusEnum status){
+		List<VehicleTrackRedis> r = new ArrayList<VehicleTrackRedis>();
 		for (int i = 0; i < quantity; i++) {
 			r.add(vehicleTrackBuilder.buildRandom(minBefore, minIniBefore, status));
 		}

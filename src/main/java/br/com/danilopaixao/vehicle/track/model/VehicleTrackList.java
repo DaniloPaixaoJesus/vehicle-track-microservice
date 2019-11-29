@@ -12,18 +12,18 @@ public class VehicleTrackList implements Serializable{
 	
 	public VehicleTrackList() {}
 	
-	public VehicleTrackList(List<VehicleTrack> vehicleTrackList) {
+	public VehicleTrackList(List<VehicleTrackRedis> vehicleTrackList) {
 		super();
 		this.vehicleTrackList = vehicleTrackList;
 	}
 	
-	private List<VehicleTrack> vehicleTrackList;
+	private List<VehicleTrackRedis> vehicleTrackList;
 
-	public List<VehicleTrack> getVehicleTrackList() {
+	public List<VehicleTrackRedis> getVehicleTrackList() {
 		return vehicleTrackList;
 	}
 
-	public void setVehicleTrackList(List<VehicleTrack> vehicleTrackList) {
+	public void setVehicleTrackList(List<VehicleTrackRedis> vehicleTrackList) {
 		this.vehicleTrackList = vehicleTrackList;
 	}
 

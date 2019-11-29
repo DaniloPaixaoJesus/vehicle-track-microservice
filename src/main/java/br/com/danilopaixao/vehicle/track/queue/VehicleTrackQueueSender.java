@@ -14,7 +14,8 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import br.com.danilopaixao.vehicle.track.enums.StatusEnum;
-import br.com.danilopaixao.vehicle.track.model.VehicleTrack;
+import br.com.danilopaixao.vehicle.track.model.Location;
+import br.com.danilopaixao.vehicle.track.model.VehicleTrackRedis;
  
 @Component
 public class VehicleTrackQueueSender {
@@ -30,11 +31,15 @@ public class VehicleTrackQueueSender {
     @Autowired
     private Queue queue;
  
-    public VehicleTrack sendToQueueOnlineStatus(final String vin) throws JsonProcessingException {
+    public VehicleTrackRedis sendToQueueOnlineStatus(final String vin, double[] position ) throws JsonProcessingException {
     	logger.info("###### VehicleTrackQueueSender#sendQueue:{}", vin);
     	
     	ObjectMapper jsonMapper = new ObjectMapper();
-    	VehicleTrack vehicleTrack = new VehicleTrack(vin, vehicleTrackQueueName, StatusEnum.ON, ZonedDateTime.now(), null);
+    	VehicleTrackRedis vehicleTrack = new VehicleTrackRedis(vin, vehicleTrackQueueName, 
+    																StatusEnum.ON, 
+    																ZonedDateTime.now(), 
+    																null, 
+    																new Location(position[0], position[1]));
     	 String payload = jsonMapper.writeValueAsString(vehicleTrack);
         rabbitTemplate.convertAndSend(this.queue.getName(), payload);
         return vehicleTrack;

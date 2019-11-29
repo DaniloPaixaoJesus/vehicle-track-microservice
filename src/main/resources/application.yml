@@ -5,6 +5,10 @@ spring:
       WRITE_DATES_AS_TIMESTAMPS: false
   application:
     name: vehicle-track-service
+  data:
+    mongodb:
+      uri: ${MONGODB_URI:mongodb://admin:senha123@ds141208.mlab.com:41208/springclouddb}
+      database: ${MONGODB_DATABASE:springclouddb}
   rabbitmq:
     addresses: ${RABBIT_MQ_ADDRESS:chimpanzee.rmq.cloudamqp.com/zcdpcvpk}
     port: ${RABBIT_MQ_PORT:5672} 

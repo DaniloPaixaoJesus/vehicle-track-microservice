@@ -1,6 +1,7 @@
 package br.com.danilopaixao.vehicle.track.service;
 
 import java.time.ZonedDateTime;
+import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,8 +12,11 @@ import org.springframework.stereotype.Service;
 
 import br.com.danilopaixao.vehicle.track.enums.StatusEnum;
 import br.com.danilopaixao.vehicle.track.model.VehicleTrack;
+import br.com.danilopaixao.vehicle.track.model.VehicleTrackRedis;
 import br.com.danilopaixao.vehicle.track.queue.VehicleTrackQueueSender;
-import br.com.danilopaixao.vehicle.track.repository.VehicleTrackRepository;
+import br.com.danilopaixao.vehicle.track.repository.VehicleTrackMongoRepository;
+import br.com.danilopaixao.vehicle.track.repository.VehicleTrackMongoRepository2;
+import br.com.danilopaixao.vehicle.track.repository.VehicleTrackRedisRepository;
 
 @Service
 public class VehicleTrackService {
@@ -23,7 +27,13 @@ public class VehicleTrackService {
 	private int secondsToOfffline;
 	
 	@Autowired
-	private VehicleTrackRepository vehicleTrackRepository;
+	private VehicleTrackRedisRepository vehicleTrackRedisRepository;
+	
+	@Autowired
+	private VehicleTrackMongoRepository vehicleTrackMongoRepository;
+	
+	@Autowired
+	private VehicleTrackMongoRepository2 vehicleTrackMongoRepository2;
 	
 	@Autowired
 	private VehicleTrackQueueSender vehicleTrackQueueSender;
@@ -33,7 +43,7 @@ public class VehicleTrackService {
 	
 	@Scheduled(cron = "0/59 * * * * ?")
 	public void processOffLineVehicle() {
-		Iterable<VehicleTrack> cache = vehicleTrackRepository.findAll();
+		Iterable<VehicleTrackRedis> cache = vehicleTrackRedisRepository.findAll();
 		if(cache == null) {
 			logger.info("##Execution offline vehicle routine: NO VEHICLE");
 			return;
@@ -51,33 +61,48 @@ public class VehicleTrackService {
 				}
 			});
 	}
-	
-	public VehicleTrack insertIntoQueueOnlineStatus(String vin) throws Throwable {
-		logger.info("##VehicleTrackService##insertIntoQueue: {}", vin);
-		return vehicleTrackQueueSender.sendToQueueOnlineStatus(vin);
+
+	public List<VehicleTrack> findNearest(double latitude, double longitude, double distance) {
+		return vehicleTrackMongoRepository2.findNearest(latitude, longitude, distance);
 	}
 	
-	public VehicleTrack insertVehicleTrack(VehicleTrack vehicleTrack) {
+	public VehicleTrackRedis insertIntoQueueOnlineStatus(String vin, double[] position) throws Throwable {
+		logger.info("##VehicleTrackService##insertIntoQueue: {} : {}", position);
+		return vehicleTrackQueueSender.sendToQueueOnlineStatus(vin, position);
+	}
+	
+	public VehicleTrackRedis insertVehicleTrack(VehicleTrackRedis vehicleTrack) {
 		logger.info("##VehicleTrackService##insertVehicleTrack: {}", vehicleTrack.getVin());
-		return vehicleTrackRepository.save(vehicleTrack);
+		vehicleTrackMongoRepository.save(toVehicleTrack(vehicleTrack));
+		return vehicleTrackRedisRepository.save(vehicleTrack);
 	}
 	
-	public VehicleTrack getVehicleTrack(String vin) {
+	private VehicleTrack toVehicleTrack(VehicleTrackRedis vehicleTrackRedis) {
+		return new VehicleTrack(vehicleTrackRedis.getVin(), 
+				vehicleTrackRedis.getQueue(), 
+				vehicleTrackRedis.getStatus(), 
+				vehicleTrackRedis.getDtIniStatus(), 
+				vehicleTrackRedis.getDtIniStatus(),
+				vehicleTrackRedis.getGeolocation());
+	}
+	
+	public VehicleTrackRedis getVehicleTrack(String vin) {
 		logger.info("##VehicleTrackService##getVehicleTrack: {}", vin);
 		//TODO: use Optional class
-		return vehicleTrackRepository.findById(vin).orElse(null);
+		return vehicleTrackRedisRepository.findById(vin).orElse(null);
 	}
 	
-	public Iterable<VehicleTrack> findAll() {
-		return vehicleTrackRepository.findAll();
+	public Iterable<VehicleTrackRedis> findAll() {
+		return vehicleTrackRedisRepository.findAll();
 	}
 	
-	public Iterable<VehicleTrack> getAllVehicleTrack() {
-		return vehicleTrackRepository.findAll();
+	public Iterable<VehicleTrackRedis> getAllVehicleTrack() {
+		return vehicleTrackRedisRepository.findAll();
 	}
 
-	public VehicleTrack updateVehicleTrack(VehicleTrack vehicleTrack) {
+	public VehicleTrackRedis updateVehicleTrack(VehicleTrackRedis vehicleTrack) {
 		logger.info("##VehicleTrackService##updateVehicleTrack: {}/{}", vehicleTrack.getVin(), vehicleTrack.getStatus());
-		return vehicleTrackRepository.save(vehicleTrack);
+		vehicleTrackMongoRepository.save(toVehicleTrack(vehicleTrack));
+		return vehicleTrackRedisRepository.save(vehicleTrack);
 	}
 }
