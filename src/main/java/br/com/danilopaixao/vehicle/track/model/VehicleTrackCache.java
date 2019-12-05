@@ -1,10 +1,15 @@
 package br.com.danilopaixao.vehicle.track.model;
 
 import java.io.Serializable;
-import java.time.ZonedDateTime;
+import java.time.LocalDateTime;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.redis.core.RedisHash;
+
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import br.com.danilopaixao.vehicle.track.config.LocalDateTimeDeserializer;
+import br.com.danilopaixao.vehicle.track.config.LocalDateTimeSerializer;
 
 import br.com.danilopaixao.vehicle.track.enums.StatusEnum;
 import br.com.danilopaixao.vehicle.track.utils.DateTimeUtils;
@@ -21,15 +26,17 @@ public class VehicleTrackCache implements Serializable {
 	private String vin;
 	private String queue;
 	private StatusEnum status;
-//	@JsonIgnore
-	private ZonedDateTime dtStatus;
+	// @JsonIgnore
+	@JsonSerialize(using = LocalDateTimeSerializer.class)
+	@JsonDeserialize(using = LocalDateTimeDeserializer.class)
+	private LocalDateTime dtStatus;
 	//db.vehicleTrack.ensureIndex( { location: "2d" } );
 	private Location geolocation;
 
 	public VehicleTrackCache() {
 	}
 
-	public VehicleTrackCache(String vin, String queue, StatusEnum status, ZonedDateTime dtStatus, Location geolocation) {
+	public VehicleTrackCache(String vin, String queue, StatusEnum status, LocalDateTime dtStatus, Location geolocation) {
 		super();
 		this.vin = vin;
 		this.queue = queue;
@@ -39,7 +46,7 @@ public class VehicleTrackCache implements Serializable {
 	}
 	
 	public boolean isOffLineVehicle(int seconds) {
-		long diff = DateTimeUtils.secsDiff(dtStatus, ZonedDateTime.now());
+		long diff = DateTimeUtils.secsDiff(dtStatus, LocalDateTime.now());
 		return diff > seconds ? Boolean.TRUE : Boolean.FALSE;
 	}
 
@@ -67,11 +74,11 @@ public class VehicleTrackCache implements Serializable {
 		this.status = status;
 	}
 
-	public ZonedDateTime getDtStatus() {
+	public LocalDateTime getDtStatus() {
 		return dtStatus;
 	}
 
-	public void setDtStatus(ZonedDateTime dtStatus) {
+	public void setDtStatus(LocalDateTime dtStatus) {
 		this.dtStatus = dtStatus;
 	}
 	

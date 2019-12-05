@@ -1,6 +1,6 @@
 package br.com.danilopaixao.vehicle.track.utils;
 
-import java.time.ZonedDateTime;
+import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 
 public class DateTimeUtils {
@@ -11,10 +11,10 @@ public class DateTimeUtils {
 //		System.out.println(secsDiff(outraData, hoje));
 //	}
 	
-	public static long minsDiff(ZonedDateTime iniDt, ZonedDateTime endDt) {
+	public static long minsDiff(LocalDateTime iniDt, LocalDateTime endDt) {
         return ChronoUnit.MINUTES.between(iniDt, endDt);
 	}
-	public static long secsDiff(ZonedDateTime iniDt, ZonedDateTime endDt) {
+	public static long secsDiff(LocalDateTime iniDt, LocalDateTime endDt) {
         return ChronoUnit.SECONDS.between(iniDt, endDt);
 	}
 }

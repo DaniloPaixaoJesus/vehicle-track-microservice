@@ -1,6 +1,6 @@
 package br.com.danilopaixao.vehicle.track.queue;
 
-import java.time.ZonedDateTime;
+import java.time.LocalDateTime;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -66,18 +66,19 @@ public class VehicleTrackQueueConsumer {
         		vehicleTrackCache = new VehicleTrackCache(vehicleTrackPayload.getVin(), 
         													queueVehicleTrackName, 
         													StatusEnum.ON, 
-        													ZonedDateTime.now(), 
+        													LocalDateTime.now(), 
         													vehicleTrackPayload.getGeolocation());
-        		vehicleService.updateVehicle(vehicleTrackPayload.getVin(), StatusEnum.ON);
+        		//vehicleService.updateVehicle(vehicleTrackPayload.getVin(), StatusEnum.ON);
         		vehicleTrackService.insertVehicleTrackCache(vehicleTrackCache);
         		vehicleTrackService.insertVehicleTrack(VehicleTrackMapper
         								.fromVehicleTrackCache(vehicleTrackCache));
         		vehicleSocketService.updateStatusWebSocket(vehicleTrackPayload.getVin(), StatusEnum.ON);
-        	}else if (vehicleTrackCache.getStatus() == StatusEnum.OFF){
+        	}else{
         		logger.info("###### VehicleTrackQueueConsumer#receive - update cache database, vin {}, status {}", vehicleTrackPayload.getVin(), StatusEnum.ON);
         		vehicleTrackCache.setStatus(StatusEnum.ON);
+        		vehicleTrackCache.setDtStatus(LocalDateTime.now());
         		vehicleTrackCache.setGeolocation(vehicleTrackPayload.getGeolocation());
-        		vehicleService.updateVehicle(vehicleTrackPayload.getVin(), StatusEnum.ON);
+        		//vehicleService.updateVehicle(vehicleTrackPayload.getVin(), StatusEnum.ON);
         		vehicleTrackService.saveVehicleTrackCache(vehicleTrackCache);
         		vehicleTrackService.insertVehicleTrack(VehicleTrackMapper
 										.fromVehicleTrackCache(vehicleTrackCache));

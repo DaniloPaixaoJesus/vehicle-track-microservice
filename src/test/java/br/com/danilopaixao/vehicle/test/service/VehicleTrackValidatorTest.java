@@ -2,7 +2,7 @@ package br.com.danilopaixao.vehicle.test.service;
 
 import static org.junit.Assert.assertTrue;
 
-import java.time.ZonedDateTime;
+import java.time.LocalDateTime;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -23,7 +23,7 @@ public class VehicleTrackValidatorTest {
 //	public void testValidatorTimeLimiteNOk() throws Exception {
 //		Whitebox.setInternalState(validator, "timeLimiteMinutes", 200L);
 //        assertFalse(validator.validar(new VehicleTrackTestBuilder()
-//        									.setDtStatus(ZonedDateTime.now())
+//        									.setDtStatus(LocalDateTime.now())
 //        									.build()));
 //	}
 	
@@ -31,7 +31,7 @@ public class VehicleTrackValidatorTest {
 	public void testValidatorTimeLimiteOk() throws Exception {
 		Whitebox.setInternalState(validator, "timeLimiteMinutes", 200L);
         assertTrue(validator.validar(new VehicleTrackTestBuilder()
-        									.setDtStatus(ZonedDateTime.now())
+        									.setDtStatus(LocalDateTime.now())
         									.build()));
 	}
 	

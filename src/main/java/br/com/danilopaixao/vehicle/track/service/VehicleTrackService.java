@@ -1,6 +1,6 @@
 package br.com.danilopaixao.vehicle.track.service;
 
-import java.time.ZonedDateTime;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -45,10 +45,16 @@ public class VehicleTrackService {
 	@Autowired
 	private VehicleService vehicleService;
 	
+	@Autowired
+	private VehicleTrackService vehicleTrackService;
+	
+	@Value("${queue.vehicle.track.name}")
+	private String queueVehicleTrackName;
+	
 	@Scheduled(cron = "0/59 * * * * ?")
 	public void processOffLineVehicle() {
-		Iterable<VehicleTrackCache> vehicleTrackCache = this.findAllVehicleTrackCache();
-		if(vehicleTrackCache == null) {
+		Iterable<VehicleTrackCache> listVehicleTrackCache = this.findAllVehicleTrackCache();
+		if(listVehicleTrackCache == null) {
 			VehicleList vehicleList = vehicleService.getAllVehicle();
 			if( vehicleList == null
 					|| vehicleList.getVehicleList() == null
@@ -56,17 +62,21 @@ public class VehicleTrackService {
 				logger.info("##Execution offline vehicle routine: NO VEHICLE");
 				return;	
 			}
-			vehicleTrackCache = toVehicleTrackCache(vehicleList.getVehicleList());
+			listVehicleTrackCache = toVehicleTrackCache(vehicleList.getVehicleList());
 		}
-		logger.info("##Execution offline vehicle routine - vehicles found ...");
-		vehicleTrackCache.forEach(tracker -> {
-				if(tracker.getStatus() == StatusEnum.ON) {
-					if(tracker.isOffLineVehicle(secondsToOfffline)) {
-						logger.info("vin status OFF:"+tracker.getVin());
-						tracker.setStatus(StatusEnum.OFF);
-						tracker.setDtStatus(ZonedDateTime.now());
-						this.saveVehicleTrackCache(tracker);
-						vehicleService.updateVehicle(tracker.getVin(), StatusEnum.OFF);
+		listVehicleTrackCache.forEach(vehicleTrack -> {
+				if(vehicleTrack.getStatus() == StatusEnum.ON) {
+					if(vehicleTrack.isOffLineVehicle(secondsToOfffline)) {
+						logger.info("vin status OFF:"+vehicleTrack.getVin());
+						vehicleTrack.setStatus(StatusEnum.OFF);
+						vehicleTrack.setDtStatus(LocalDateTime.now());
+						this.saveVehicleTrackCache(vehicleTrack);
+						vehicleTrackService.insertVehicleTrack(new VehicleTrack(vehicleTrack.getVin(), 
+																	queueVehicleTrackName, 
+																	StatusEnum.OFF, 
+																	LocalDateTime.now(), 
+																	vehicleTrack.getGeolocation()));
+						vehicleService.updateVehicle(vehicleTrack.getVin(), StatusEnum.OFF);
 					}
 				}
 			});
@@ -90,15 +100,6 @@ public class VehicleTrackService {
 		logger.info("##VehicleTrackService##insertVehicleTrack: {}", vehicleTrack.getVin());
 		return vehicleTrackMongoRepository.save(vehicleTrack);
 	}
-	
-//	private VehicleTrack toVehicleTrack(VehicleTrackCache vehicleTrackRedis) {
-//		return new VehicleTrack(vehicleTrackRedis.getVin(), 
-//				vehicleTrackRedis.getQueue(), 
-//				vehicleTrackRedis.getStatus(), 
-//				vehicleTrackRedis.getDtIniStatus(), 
-//				vehicleTrackRedis.getDtIniStatus(),
-//				vehicleTrackRedis.getGeolocation());
-//	}
 	
 	public VehicleTrackCache getVehicleTrack(String vin) {
 		logger.info("##VehicleTrackService##getVehicleTrack: {}", vin);

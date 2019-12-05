@@ -1,6 +1,6 @@
 package br.com.danilopaixao.vehicle.test.builder;
 
-import java.time.ZonedDateTime;
+import java.time.LocalDateTime;
 
 import org.apache.commons.lang.RandomStringUtils;
 
@@ -12,8 +12,8 @@ public class VehicleTrackTestBuilder {
 	private String vin;
 	private String queue;
 	private StatusEnum status;
-	private ZonedDateTime dtStatus;
-	private ZonedDateTime dateTime = ZonedDateTime.now();;
+	private LocalDateTime dtStatus;
+	private LocalDateTime dateTime = LocalDateTime.now();;
 	
 	public VehicleTrackCache build() {
 		return new VehicleTrackCache(vin, queue, status, dtStatus, null);
@@ -43,7 +43,7 @@ public class VehicleTrackTestBuilder {
 		return this;
 	}
 
-	public VehicleTrackTestBuilder setDtStatus(ZonedDateTime dtStatus) {
+	public VehicleTrackTestBuilder setDtStatus(LocalDateTime dtStatus) {
 		this.dtStatus = dtStatus;
 		return this;
 	}
