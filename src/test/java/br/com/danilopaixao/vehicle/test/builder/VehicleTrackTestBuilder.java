@@ -5,7 +5,7 @@ import java.time.ZonedDateTime;
 import org.apache.commons.lang.RandomStringUtils;
 
 import br.com.danilopaixao.vehicle.track.enums.StatusEnum;
-import br.com.danilopaixao.vehicle.track.model.VehicleTrackRedis;
+import br.com.danilopaixao.vehicle.track.model.VehicleTrackCache;
 
 public class VehicleTrackTestBuilder {
 	
@@ -13,19 +13,17 @@ public class VehicleTrackTestBuilder {
 	private String queue;
 	private StatusEnum status;
 	private ZonedDateTime dtStatus;
-	private ZonedDateTime dtIniStatus;
 	private ZonedDateTime dateTime = ZonedDateTime.now();;
 	
-	public VehicleTrackRedis build() {
-		return new VehicleTrackRedis(vin, queue, status, dtStatus, dtIniStatus, null);
+	public VehicleTrackCache build() {
+		return new VehicleTrackCache(vin, queue, status, dtStatus, null);
 	}
 	
-	public VehicleTrackRedis buildRandom(int minBefore, int minIniBefore, StatusEnum status) {
-		return new VehicleTrackRedis(RandomStringUtils.random(25, true, true), 
+	public VehicleTrackCache buildRandom(int minBefore, int minIniBefore, StatusEnum status) {
+		return new VehicleTrackCache(RandomStringUtils.random(25, true, true), 
 						   RandomStringUtils.random(15, true, false),
 						   status,
 						   dateTime.plusMinutes(minBefore),
-						   dateTime.plusMinutes(minIniBefore),
 						   null
 						   );
 	}
@@ -49,11 +47,5 @@ public class VehicleTrackTestBuilder {
 		this.dtStatus = dtStatus;
 		return this;
 	}
-	
-	public VehicleTrackTestBuilder setDtIniStatus(ZonedDateTime dtIniStatus) {
-		this.dtIniStatus = dtIniStatus;
-		return this;
-	}
-
 	
 }

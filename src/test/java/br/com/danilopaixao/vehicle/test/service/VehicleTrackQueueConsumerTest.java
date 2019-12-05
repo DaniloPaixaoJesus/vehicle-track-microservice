@@ -20,7 +20,7 @@ import br.com.danilopaixao.vehicle.test.builder.VehicleTestBuilder;
 import br.com.danilopaixao.vehicle.test.builder.VehicleTrackTestBuilder;
 import br.com.danilopaixao.vehicle.track.enums.StatusEnum;
 import br.com.danilopaixao.vehicle.track.model.Vehicle;
-import br.com.danilopaixao.vehicle.track.model.VehicleTrackRedis;
+import br.com.danilopaixao.vehicle.track.model.VehicleTrackCache;
 import br.com.danilopaixao.vehicle.track.queue.VehicleTrackQueueConsumer;
 import br.com.danilopaixao.vehicle.track.service.VehicleService;
 import br.com.danilopaixao.vehicle.track.service.VehicleSocketService;
@@ -63,23 +63,23 @@ public class VehicleTrackQueueConsumerTest {
 		vehicleTrackQueueConsumer.receive(getJson(vehicleTrackBuilder.buildRandom(0, 0, StatusEnum.ON)));
 		
 		verify(vehicleTrackService, times(0)).getVehicleTrack(any(String.class));
-		verify(vehicleTrackService, times(0)).insertVehicleTrack(any(VehicleTrackRedis.class));
-		verify(vehicleTrackService, times(0)).updateVehicleTrack(any(VehicleTrackRedis.class));
+		verify(vehicleTrackService, times(0)).insertVehicleTrackCache(any(VehicleTrackCache.class));
+		verify(vehicleTrackService, times(0)).saveVehicleTrackCache(any(VehicleTrackCache.class));
 		verify(vehicleService, times(0)).updateVehicle(any(String.class), any(StatusEnum.class));
 	}
 	
 	@Test
 	public void testOnlineVehicle() throws Exception{
 		Vehicle vehicleFound = vehicleBuilder.buildRandom(StatusEnum.ON);
-		VehicleTrackRedis vehicleTrackFound = vehicleTrackBuilder.buildRandom(0, 0, StatusEnum.ON);
+		VehicleTrackCache vehicleTrackFound = vehicleTrackBuilder.buildRandom(0, 0, StatusEnum.ON);
 		vehicleTrackFound.setVin(vehicleFound.getVin());
 		when(vehicleService.getVehicle(vehicleFound.getVin())).thenReturn(vehicleFound);
 		when(vehicleTrackService.getVehicleTrack(vehicleFound.getVin())).thenReturn(vehicleTrackFound);
 		
 		vehicleTrackQueueConsumer.receive(getJson(vehicleTrackFound));
 
-		verify(vehicleTrackService, times(0)).insertVehicleTrack(any(VehicleTrackRedis.class));
-		verify(vehicleTrackService, times(0)).updateVehicleTrack(any(VehicleTrackRedis.class));
+		verify(vehicleTrackService, times(0)).insertVehicleTrackCache(any(VehicleTrackCache.class));
+		verify(vehicleTrackService, times(0)).saveVehicleTrackCache(any(VehicleTrackCache.class));
 		verify(vehicleService, times(0)).updateVehicle(any(String.class), any(StatusEnum.class));
 	}
 	
@@ -89,19 +89,19 @@ public class VehicleTrackQueueConsumerTest {
 		when(vehicleService.getVehicle(vehicleFound.getVin())).thenReturn(vehicleFound);
 		when(vehicleTrackService.getVehicleTrack(any(String.class))).thenReturn(null);
 		
-		VehicleTrackRedis vehicleTrackPayload = vehicleTrackBuilder.setVin(vehicleFound.getVin()).build();
+		VehicleTrackCache vehicleTrackPayload = vehicleTrackBuilder.setVin(vehicleFound.getVin()).build();
 		vehicleTrackQueueConsumer.receive(getJson(vehicleTrackPayload));
 		
-		verify(vehicleTrackService, times(1)).insertVehicleTrack(any(VehicleTrackRedis.class));
+		verify(vehicleTrackService, times(1)).insertVehicleTrackCache(any(VehicleTrackCache.class));
 		verify(vehicleService, times(1)).updateVehicle(vehicleTrackPayload.getVin(), StatusEnum.ON);
 		verify(vehicleService, times(0)).updateVehicle(vehicleTrackPayload.getVin(), StatusEnum.OFF);
-		verify(vehicleTrackService, times(0)).updateVehicleTrack(any(VehicleTrackRedis.class));
+		verify(vehicleTrackService, times(0)).saveVehicleTrackCache(any(VehicleTrackCache.class));
 	}
 	
 	@Test
 	public void testOfflineVehicleInCache() throws Exception{
 		Vehicle vehicleFound = vehicleBuilder.buildRandom(StatusEnum.ON);
-		VehicleTrackRedis vehicleTrackFournd = vehicleTrackBuilder.buildRandom(0, 0, StatusEnum.OFF);
+		VehicleTrackCache vehicleTrackFournd = vehicleTrackBuilder.buildRandom(0, 0, StatusEnum.OFF);
 		vehicleTrackFournd.setVin(vehicleFound.getVin());
 		when(vehicleService.getVehicle(vehicleFound.getVin())).thenReturn(vehicleFound);
 		when(vehicleTrackService.getVehicleTrack(vehicleTrackFournd.getVin())).thenReturn(vehicleTrackFournd);
@@ -111,12 +111,12 @@ public class VehicleTrackQueueConsumerTest {
 														.setVin(vehicleFound.getVin())
 														.build()));
 		
-		verify(vehicleTrackService, times(0)).insertVehicleTrack(vehicleTrackFournd);
+		verify(vehicleTrackService, times(0)).insertVehicleTrackCache(vehicleTrackFournd);
 		verify(vehicleService, times(1)).updateVehicle(vehicleTrackFournd.getVin(), StatusEnum.ON);
-		verify(vehicleTrackService, times(1)).updateVehicleTrack(vehicleTrackFournd);
+		verify(vehicleTrackService, times(1)).saveVehicleTrackCache(vehicleTrackFournd);
 	}
 	
-	private String getJson(VehicleTrackRedis v) throws Exception {
+	private String getJson(VehicleTrackCache v) throws Exception {
 		return jsonMapper.writeValueAsString(v);
 	}
 	

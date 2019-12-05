@@ -6,8 +6,6 @@ import java.time.ZonedDateTime;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
 import br.com.danilopaixao.vehicle.track.enums.StatusEnum;
 import br.com.danilopaixao.vehicle.track.utils.DateTimeUtils;
 
@@ -20,27 +18,25 @@ public class VehicleTrack implements Serializable {
 	private static final long serialVersionUID = -1569461794138116014L;
 
 	@Id
+	private String id;
+	
 	private String vin;
 	private String queue;
 	private StatusEnum status;
-	@JsonIgnore
+//	@JsonIgnore
 	private ZonedDateTime dtStatus;
-	@JsonIgnore
-	private ZonedDateTime dtIniStatus;
-	
 	//db.VehicleTrack.ensureIndex( { location: "2d" } );
 	private Location geolocation;
 
 	public VehicleTrack() {
 	}
 
-	public VehicleTrack(String vin, String queue, StatusEnum status, ZonedDateTime dtStatus, ZonedDateTime dtIniStatus, Location geolocation) {
+	public VehicleTrack(String vin, String queue, StatusEnum status, ZonedDateTime dtStatus, Location geolocation) {
 		super();
 		this.vin = vin;
 		this.queue = queue;
 		this.status = status;
 		this.dtStatus = dtStatus;
-		this.dtIniStatus = dtIniStatus;
 		this.geolocation = geolocation;
 	}
 	
@@ -55,6 +51,14 @@ public class VehicleTrack implements Serializable {
 
 	public void setVin(String vin) {
 		this.vin = vin;
+	}
+
+	public String getId() {
+		return id;
+	}
+
+	public void setId(String id) {
+		this.id = id;
 	}
 
 	public String getQueue() {
@@ -79,14 +83,6 @@ public class VehicleTrack implements Serializable {
 
 	public void setDtStatus(ZonedDateTime dtStatus) {
 		this.dtStatus = dtStatus;
-	}
-
-	public ZonedDateTime getDtIniStatus() {
-		return dtIniStatus;
-	}
-
-	public void setDtIniStatus(ZonedDateTime dtIniStatus) {
-		this.dtIniStatus = dtIniStatus;
 	}
 	
 	public Location getGeolocation() {

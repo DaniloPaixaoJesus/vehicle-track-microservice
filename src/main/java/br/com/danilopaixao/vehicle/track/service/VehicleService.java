@@ -13,6 +13,7 @@ import com.netflix.hystrix.contrib.javanica.annotation.HystrixProperty;
 
 import br.com.danilopaixao.vehicle.track.enums.StatusEnum;
 import br.com.danilopaixao.vehicle.track.model.Vehicle;
+import br.com.danilopaixao.vehicle.track.model.VehicleList;
 
 
 @Service
@@ -25,6 +26,27 @@ public class VehicleService {
 	
 	@Autowired
 	private RestTemplate restTemplate;
+	
+	@HystrixCommand(fallbackMethod ="getAllVehicleFallBack",
+			threadPoolKey = "getAllVehicleThreadPool",
+			threadPoolProperties = {
+					@HystrixProperty(name = "coreSize", value = "75"),
+					@HystrixProperty(name = "maxQueueSize", value = "35")
+			},
+			commandProperties = {
+				@HystrixProperty(name = "execution.isolation.thread.timeoutInMilliseconds", value = "2000"),
+				@HystrixProperty(name = "circuitBreaker.requestVolumeThreshold", value = "5"),
+				@HystrixProperty(name = "circuitBreaker.errorThresholdPercentage", value = "50"),
+				@HystrixProperty(name = "circuitBreaker.sleepWindowInMilliseconds", value = "5000")
+			}
+	)
+	public VehicleList getAllVehicle() {
+		return restTemplate.getForObject(vehicleRestApiUrl+"/vehicles", VehicleList.class);
+	}
+	public VehicleList getAllVehicleFallBack() {
+		logger.error("error vehicle rest service ##VehicleService#getAllVehicle({})");
+		return null;
+	}
 	
 	@HystrixCommand(fallbackMethod ="getVehicleFallBack",
 			threadPoolKey = "getVehicleThreadPool",

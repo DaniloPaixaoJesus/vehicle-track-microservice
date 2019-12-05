@@ -6,13 +6,11 @@ import java.time.ZonedDateTime;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.redis.core.RedisHash;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
 import br.com.danilopaixao.vehicle.track.enums.StatusEnum;
 import br.com.danilopaixao.vehicle.track.utils.DateTimeUtils;
 
-@RedisHash("VehicleTrack")
-public class VehicleTrackRedis implements Serializable {
+@RedisHash("VehicleTrackCache1")
+public class VehicleTrackCache implements Serializable {
 
 	/**
 	 * 
@@ -23,24 +21,20 @@ public class VehicleTrackRedis implements Serializable {
 	private String vin;
 	private String queue;
 	private StatusEnum status;
-	@JsonIgnore
+//	@JsonIgnore
 	private ZonedDateTime dtStatus;
-	@JsonIgnore
-	private ZonedDateTime dtIniStatus;
-	
 	//db.vehicleTrack.ensureIndex( { location: "2d" } );
 	private Location geolocation;
 
-	public VehicleTrackRedis() {
+	public VehicleTrackCache() {
 	}
 
-	public VehicleTrackRedis(String vin, String queue, StatusEnum status, ZonedDateTime dtStatus, ZonedDateTime dtIniStatus, Location geolocation) {
+	public VehicleTrackCache(String vin, String queue, StatusEnum status, ZonedDateTime dtStatus, Location geolocation) {
 		super();
 		this.vin = vin;
 		this.queue = queue;
 		this.status = status;
 		this.dtStatus = dtStatus;
-		this.dtIniStatus = dtIniStatus;
 		this.geolocation = geolocation;
 	}
 	
@@ -80,14 +74,6 @@ public class VehicleTrackRedis implements Serializable {
 	public void setDtStatus(ZonedDateTime dtStatus) {
 		this.dtStatus = dtStatus;
 	}
-
-	public ZonedDateTime getDtIniStatus() {
-		return dtIniStatus;
-	}
-
-	public void setDtIniStatus(ZonedDateTime dtIniStatus) {
-		this.dtIniStatus = dtIniStatus;
-	}
 	
 	public Location getGeolocation() {
 		return this.geolocation;
@@ -116,7 +102,7 @@ public class VehicleTrackRedis implements Serializable {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		VehicleTrackRedis other = (VehicleTrackRedis) obj;
+		VehicleTrackCache other = (VehicleTrackCache) obj;
 		if (dtStatus == null) {
 			if (other.dtStatus != null)
 				return false;

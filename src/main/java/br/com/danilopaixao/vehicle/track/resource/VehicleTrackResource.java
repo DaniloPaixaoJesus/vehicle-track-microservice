@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import br.com.danilopaixao.vehicle.track.model.VehicleTrack;
-import br.com.danilopaixao.vehicle.track.model.VehicleTrackRedis;
+import br.com.danilopaixao.vehicle.track.model.VehicleTrackCache;
 import br.com.danilopaixao.vehicle.track.service.VehicleTrackService;
 
 
@@ -33,20 +33,20 @@ public class VehicleTrackResource {
 	@GetMapping(value="", 
 				produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
 	@ResponseStatus(HttpStatus.OK)
-	public Iterable<VehicleTrackRedis> findAll() {
-		return service.findAll();
+	public Iterable<VehicleTrackCache> findAll() {
+		return service.findAllVehicleTrackCache();
 	}
 	
 	@GetMapping(value = "/queue/{vin}", 
 				produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
 	@ResponseStatus(HttpStatus.OK)
-	public VehicleTrackRedis getVehicleTrack(@PathVariable("vin") final String vin) {
+	public VehicleTrackCache getVehicleTrack(@PathVariable("vin") final String vin) {
 		return service.getVehicleTrack(vin);
 	}
 	
 	@PostMapping(value = "")
-	public VehicleTrackRedis insertNewVehicleTrack(@RequestBody(required = true) final VehicleTrackRedis vehicleTrack) {
-		return service.insertVehicleTrack(vehicleTrack);
+	public VehicleTrackCache insertNewVehicleTrack(@RequestBody(required = true) final VehicleTrackCache vehicleTrack) {
+		return service.insertVehicleTrackCache(vehicleTrack);
 	}
 	
 	@GetMapping(value = "/near/{latitude}/{longitude}/{distance}")
@@ -57,20 +57,20 @@ public class VehicleTrackResource {
 	
 	@PutMapping("/{vin}/{lat}/{lon}")
 	@ResponseStatus(HttpStatus.ACCEPTED)
-	public ResponseEntity<VehicleTrackRedis> updateOnlineStatus(@PathVariable("vin") final String vin,
+	public ResponseEntity<VehicleTrackCache> updateOnlineStatus(@PathVariable("vin") final String vin,
 			@PathVariable("lat") final double lat, @PathVariable("lon") final double lon) throws Throwable {
 		double[] position = {lat, lon};
-		VehicleTrackRedis vehicleTrack = service.insertIntoQueueOnlineStatus(vin, position);
+		VehicleTrackCache vehicleTrack = service.insertIntoQueueOnlineStatus(vin, position);
 		
 		MultiValueMap<String, String> header = new LinkedMultiValueMap<String, String>();
 		if(vehicleTrack == null) {
-			return new ResponseEntity<VehicleTrackRedis>(null, null, HttpStatus.NOT_FOUND);
+			return new ResponseEntity<VehicleTrackCache>(null, null, HttpStatus.NOT_FOUND);
 		}
 		
 		String locationHeader = "/api/v1/vehicle-track/queue/"+vehicleTrack.getVin();
 		header.put("Location", Arrays.asList(locationHeader));
 		
-		return new ResponseEntity<VehicleTrackRedis>(vehicleTrack, header, HttpStatus.ACCEPTED);
+		return new ResponseEntity<VehicleTrackCache>(vehicleTrack, header, HttpStatus.ACCEPTED);
 	}
 	
 }

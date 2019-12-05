@@ -2,6 +2,7 @@ package br.com.danilopaixao.vehicle.track.service;
 
 import java.time.ZonedDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,8 +12,11 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import br.com.danilopaixao.vehicle.track.enums.StatusEnum;
+import br.com.danilopaixao.vehicle.track.mapper.VehicleTrackCacheMapper;
+import br.com.danilopaixao.vehicle.track.model.Vehicle;
+import br.com.danilopaixao.vehicle.track.model.VehicleList;
 import br.com.danilopaixao.vehicle.track.model.VehicleTrack;
-import br.com.danilopaixao.vehicle.track.model.VehicleTrackRedis;
+import br.com.danilopaixao.vehicle.track.model.VehicleTrackCache;
 import br.com.danilopaixao.vehicle.track.queue.VehicleTrackQueueSender;
 import br.com.danilopaixao.vehicle.track.repository.VehicleTrackMongoRepository;
 import br.com.danilopaixao.vehicle.track.repository.VehicleTrackMongoRepository2;
@@ -43,19 +47,25 @@ public class VehicleTrackService {
 	
 	@Scheduled(cron = "0/59 * * * * ?")
 	public void processOffLineVehicle() {
-		Iterable<VehicleTrackRedis> cache = vehicleTrackRedisRepository.findAll();
-		if(cache == null) {
-			logger.info("##Execution offline vehicle routine: NO VEHICLE");
-			return;
+		Iterable<VehicleTrackCache> vehicleTrackCache = this.findAllVehicleTrackCache();
+		if(vehicleTrackCache == null) {
+			VehicleList vehicleList = vehicleService.getAllVehicle();
+			if( vehicleList == null
+					|| vehicleList.getVehicleList() == null
+					|| vehicleList.getVehicleList().isEmpty()) {
+				logger.info("##Execution offline vehicle routine: NO VEHICLE");
+				return;	
+			}
+			vehicleTrackCache = toVehicleTrackCache(vehicleList.getVehicleList());
 		}
-		logger.info("##Execution offline vehicle routine: {}", cache);
-		cache.forEach(tracker -> {
+		logger.info("##Execution offline vehicle routine - vehicles found ...");
+		vehicleTrackCache.forEach(tracker -> {
 				if(tracker.getStatus() == StatusEnum.ON) {
 					if(tracker.isOffLineVehicle(secondsToOfffline)) {
 						logger.info("vin status OFF:"+tracker.getVin());
 						tracker.setStatus(StatusEnum.OFF);
 						tracker.setDtStatus(ZonedDateTime.now());
-						this.updateVehicleTrack(tracker);
+						this.saveVehicleTrackCache(tracker);
 						vehicleService.updateVehicle(tracker.getVin(), StatusEnum.OFF);
 					}
 				}
@@ -66,43 +76,55 @@ public class VehicleTrackService {
 		return vehicleTrackMongoRepository2.findNearest(latitude, longitude, distance);
 	}
 	
-	public VehicleTrackRedis insertIntoQueueOnlineStatus(String vin, double[] position) throws Throwable {
+	public VehicleTrackCache insertIntoQueueOnlineStatus(String vin, double[] position) throws Throwable {
 		logger.info("##VehicleTrackService##insertIntoQueue: {} : {}", position);
 		return vehicleTrackQueueSender.sendToQueueOnlineStatus(vin, position);
 	}
 	
-	public VehicleTrackRedis insertVehicleTrack(VehicleTrackRedis vehicleTrack) {
+	public VehicleTrackCache insertVehicleTrackCache(VehicleTrackCache vehicleTrackCache) {
+		logger.info("##VehicleTrackService##insertVehicleTrackCache: {}", vehicleTrackCache.getVin());
+		return vehicleTrackRedisRepository.save(vehicleTrackCache);
+	}
+	
+	public VehicleTrack insertVehicleTrack(VehicleTrack vehicleTrack) {
 		logger.info("##VehicleTrackService##insertVehicleTrack: {}", vehicleTrack.getVin());
-		vehicleTrackMongoRepository.save(toVehicleTrack(vehicleTrack));
-		return vehicleTrackRedisRepository.save(vehicleTrack);
+		return vehicleTrackMongoRepository.save(vehicleTrack);
 	}
 	
-	private VehicleTrack toVehicleTrack(VehicleTrackRedis vehicleTrackRedis) {
-		return new VehicleTrack(vehicleTrackRedis.getVin(), 
-				vehicleTrackRedis.getQueue(), 
-				vehicleTrackRedis.getStatus(), 
-				vehicleTrackRedis.getDtIniStatus(), 
-				vehicleTrackRedis.getDtIniStatus(),
-				vehicleTrackRedis.getGeolocation());
-	}
+//	private VehicleTrack toVehicleTrack(VehicleTrackCache vehicleTrackRedis) {
+//		return new VehicleTrack(vehicleTrackRedis.getVin(), 
+//				vehicleTrackRedis.getQueue(), 
+//				vehicleTrackRedis.getStatus(), 
+//				vehicleTrackRedis.getDtIniStatus(), 
+//				vehicleTrackRedis.getDtIniStatus(),
+//				vehicleTrackRedis.getGeolocation());
+//	}
 	
-	public VehicleTrackRedis getVehicleTrack(String vin) {
+	public VehicleTrackCache getVehicleTrack(String vin) {
 		logger.info("##VehicleTrackService##getVehicleTrack: {}", vin);
 		//TODO: use Optional class
 		return vehicleTrackRedisRepository.findById(vin).orElse(null);
 	}
 	
-	public Iterable<VehicleTrackRedis> findAll() {
-		return vehicleTrackRedisRepository.findAll();
-	}
-	
-	public Iterable<VehicleTrackRedis> getAllVehicleTrack() {
+	public Iterable<VehicleTrackCache> findAllVehicleTrackCache() {
 		return vehicleTrackRedisRepository.findAll();
 	}
 
-	public VehicleTrackRedis updateVehicleTrack(VehicleTrackRedis vehicleTrack) {
-		logger.info("##VehicleTrackService##updateVehicleTrack: {}/{}", vehicleTrack.getVin(), vehicleTrack.getStatus());
-		vehicleTrackMongoRepository.save(toVehicleTrack(vehicleTrack));
-		return vehicleTrackRedisRepository.save(vehicleTrack);
+	public VehicleTrackCache saveVehicleTrackCache(VehicleTrackCache vehicleTrackCache) {
+		logger.info("##VehicleTrackService##save: {}/{}", vehicleTrackCache.getVin(), vehicleTrackCache.getStatus());
+		return vehicleTrackRedisRepository.save(vehicleTrackCache);
 	}
+	
+	public VehicleTrack saveVehicleTrack(VehicleTrack vehicleTrack) {
+		logger.info("##VehicleTrackService##updateVehicleTrack: {}/{}", vehicleTrack.getVin(), vehicleTrack.getStatus());
+		return vehicleTrackMongoRepository.save(vehicleTrack);
+	}
+	
+	private Iterable<VehicleTrackCache> toVehicleTrackCache(List<Vehicle> vehicleList) {
+		return vehicleList.stream()
+							.map(VehicleTrackCacheMapper.fromVehicle)
+							.collect(Collectors.toList());
+	}
+
+
 }
