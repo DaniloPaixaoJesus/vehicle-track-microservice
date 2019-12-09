@@ -44,6 +44,9 @@ public class VehicleService {
 	public VehicleList getAllVehicle() {
 		return restTemplate.getForObject(vehicleRestApiUrl+"/vehicles", VehicleList.class);
 	}
+	public VehicleList getAllOnLineVehicle() {
+		return restTemplate.getForObject(vehicleRestApiUrl+"/vehicles", VehicleList.class);
+	}
 	public VehicleList getAllVehicleFallBack() {
 		logger.error("error vehicle rest service ##VehicleService#getAllVehicle({})");
 		return null;

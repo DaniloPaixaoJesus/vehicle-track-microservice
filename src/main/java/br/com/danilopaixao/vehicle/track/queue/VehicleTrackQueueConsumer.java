@@ -87,7 +87,7 @@ public class VehicleTrackQueueConsumer {
         	logger.info("###### VehicleTrackQueueConsumer#receive: end of process");        	
 		} catch (Exception e) {
 			logger.error("###### VehicleTrackQueueConsumer# error", e);
-			return;
+			throw new RuntimeException(e); 
 		}
     }
 }

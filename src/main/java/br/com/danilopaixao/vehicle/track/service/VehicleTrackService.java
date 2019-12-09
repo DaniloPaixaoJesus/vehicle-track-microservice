@@ -52,7 +52,7 @@ public class VehicleTrackService {
 	public void processOffLineVehicle() {
 		Iterable<VehicleTrackCache> listVehicleTrackCache = this.findAllVehicleTrackCache();
 		if(listVehicleTrackCache == null) {
-			VehicleList vehicleList = vehicleService.getAllVehicle();
+			VehicleList vehicleList = vehicleService.getAllOnLineVehicle();
 			if( vehicleList == null
 					|| vehicleList.getVehicleList() == null
 					|| vehicleList.getVehicleList().isEmpty()) {
@@ -76,6 +76,34 @@ public class VehicleTrackService {
 						vehicleService.updateVehicleStatus(vehicleTrack.getVin(), StatusEnum.OFF, vehicleTrack.getGeolocation());
 					}
 				}
+			});
+	}
+	
+	//@Scheduled(cron = "0/59 * * * * ?")
+	public void loadRedisDataFromMongo() {
+		//TODO: change code to execute once a day after midnight
+		VehicleList vehicleList = vehicleService.getAllVehicle();
+		if( vehicleList == null
+				|| vehicleList.getVehicleList() == null
+				|| vehicleList.getVehicleList().isEmpty()) {
+			logger.info("##Execution offline vehicle routine: NO VEHICLE");
+			return;	
+		}
+		Iterable<VehicleTrackCache> listVehicleTrackCache = toVehicleTrackCache(vehicleList.getVehicleList());
+		listVehicleTrackCache.forEach(vehicleTrackCache -> {
+				if(vehicleTrackCache.getStatus() == StatusEnum.ON) {
+					if(vehicleTrackCache.isOffLineVehicle(secondsToOfffline)) {
+						vehicleTrackCache.setStatus(StatusEnum.OFF);
+						vehicleTrackCache.setDtStatus(LocalDateTime.now());
+						this.insertVehicleTrack(new VehicleTrack(vehicleTrackCache.getVin(), 
+												queueVehicleTrackName, 
+												vehicleTrackCache.getStatus(), 
+												vehicleTrackCache.getDtStatus(), 
+												vehicleTrackCache.getGeolocation()));
+						vehicleService.updateVehicleStatus(vehicleTrackCache.getVin(), StatusEnum.OFF, vehicleTrackCache.getGeolocation());
+					}
+				}
+				this.saveVehicleTrackCache(vehicleTrackCache);
 			});
 	}
 
