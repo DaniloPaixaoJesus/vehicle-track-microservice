@@ -25,6 +25,8 @@ spring:
     jedis:      pool:        max-active: 10
 queue:
   vehicle:
+    service:
+      update: ${VEHICLE_SERVICE_UPDATE_QUEUE:VehicleQueue}
     track:
       name: ${VEHICLE_TRACK_QUEUE:VehicleTrackQueue} 
 server:

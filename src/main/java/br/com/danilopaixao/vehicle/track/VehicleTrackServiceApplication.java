@@ -35,6 +35,9 @@ public class VehicleTrackServiceApplication {
 	@Value("${queue.vehicle.track.name}")
     private String vehicleTrackQueue;
 	
+	@Value("${queue.vehicle.service.update}")
+	private String vehicleserviceUpdateQueue;
+	
 	@Value("${spring.redis.host}")
     private String REDIS_HOST;
 	
@@ -96,9 +99,14 @@ public class VehicleTrackServiceApplication {
         return template;
     }
     
-    @Bean
-    public Queue queue() {
+    @Bean("${queue.vehicle.track.name}")
+    public Queue queueVehicleTrack() {
         return new Queue(vehicleTrackQueue, true);
+    }
+    
+    @Bean("${queue.vehicle.service.update}")
+    public Queue queueVehicleUpdate() {
+        return new Queue(vehicleserviceUpdateQueue, true);
     }
 
 }

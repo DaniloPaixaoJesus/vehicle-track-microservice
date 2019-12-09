@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.client.RestTemplate;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.netflix.hystrix.contrib.javanica.annotation.HystrixCommand;
 import com.netflix.hystrix.contrib.javanica.annotation.HystrixProperty;
 
@@ -15,6 +16,7 @@ import br.com.danilopaixao.vehicle.track.enums.StatusEnum;
 import br.com.danilopaixao.vehicle.track.model.Location;
 import br.com.danilopaixao.vehicle.track.model.Vehicle;
 import br.com.danilopaixao.vehicle.track.model.VehicleList;
+import br.com.danilopaixao.vehicle.track.queue.VehicleTrackQueueSender;
 
 
 @Service
@@ -27,6 +29,9 @@ public class VehicleService {
 	
 	@Autowired
 	private RestTemplate restTemplate;
+	
+	@Autowired
+	VehicleTrackQueueSender vehicleTrackQueueSender; 
 	
 	@HystrixCommand(fallbackMethod ="getAllVehicleFallBack",
 			threadPoolKey = "getAllVehicleThreadPool",
@@ -90,7 +95,7 @@ public class VehicleService {
 				@HystrixProperty(name = "circuitBreaker.sleepWindowInMilliseconds", value = "5000")
 			}
 	)
-	public void updateVehicleStatus(final String vin, StatusEnum status, Location location) {
+	public void updateVehicleStatus(final String vin, StatusEnum status, Location location){
 		if(StringUtils.isEmpty(vin)
 				|| StringUtils.isEmpty(status)
 				|| StringUtils.isEmpty(location)) {
@@ -98,8 +103,13 @@ public class VehicleService {
 			throw new IllegalArgumentException("location, vin or status null");
 		}
 		logger.info("##VehicleService#updateVehicle({}, {}, {})", vin, status, location);
-		String url = vehicleRestApiUrl+"/vehicles/"+vin+"/status/"+status;
-		restTemplate.put(url, location);
+//		String url = vehicleRestApiUrl+"/vehicles/"+vin+"/status/"+status;
+//		restTemplate.put(url, location);
+		try {
+			vehicleTrackQueueSender.sendToVehicleQueue(vin, status, location);
+		} catch (JsonProcessingException e) {
+			throw new RuntimeException(e);
+		}
 	}
 	public void updateVehicleStatusFallBack(final String vin, StatusEnum status, Location location) {
 		logger.error("error vehicle rest service ##VehicleService#updateVehicleFallBack({}, {}, {})", vin, status, location);
