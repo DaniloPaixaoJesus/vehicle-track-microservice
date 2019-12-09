@@ -19,7 +19,9 @@ import org.mockito.junit.MockitoJUnitRunner;
 
 import br.com.danilopaixao.vehicle.test.builder.VehicleTrackTestBuilder;
 import br.com.danilopaixao.vehicle.track.enums.StatusEnum;
+import br.com.danilopaixao.vehicle.track.model.Location;
 import br.com.danilopaixao.vehicle.track.model.VehicleTrackCache;
+import br.com.danilopaixao.vehicle.track.repository.VehicleTrackMongoRepository;
 import br.com.danilopaixao.vehicle.track.repository.VehicleTrackRedisRepository;
 import br.com.danilopaixao.vehicle.track.service.VehicleService;
 import br.com.danilopaixao.vehicle.track.service.VehicleTrackService;
@@ -32,6 +34,9 @@ public class VehicleTrackServiceTest {
 	
 	@Mock
 	private VehicleTrackRedisRepository vehicleTrackRepository;
+	
+	@Mock
+	private VehicleTrackMongoRepository vehicleTrackMongoRepository;
 	
 	@Mock
 	private VehicleService vehicleService;
@@ -56,7 +61,9 @@ public class VehicleTrackServiceTest {
 		Whitebox.setInternalState(vehicleTrackService, "secondsToOfffline", 60);
 		vehicleTrackService.processOffLineVehicle();
 		verify(vehicleTrackRepository, times(vehicleQuantity)).save(vehicleTrackListFound.get(0));
-		verify(vehicleService, times(vehicleQuantity)).updateVehicle(vehicleTrackListFound.get(0).getVin(), StatusEnum.OFF);
+		verify(vehicleService, times(vehicleQuantity)).updateVehicleStatus(vehicleTrackListFound.get(0).getVin(), 
+															StatusEnum.OFF, 
+															vehicleTrackListFound.get(0).getGeolocation());
 	}
 	
 	@Test
@@ -72,7 +79,7 @@ public class VehicleTrackServiceTest {
 		Whitebox.setInternalState(vehicleTrackService, "secondsToOfffline", 61);
 		vehicleTrackService.processOffLineVehicle();
 		verify(vehicleTrackRepository, times(0)).save(any(VehicleTrackCache.class));
-		verify(vehicleService, times(0)).updateVehicle(any(String.class), any(StatusEnum.class));
+		verify(vehicleService, times(0)).updateVehicleStatus(any(String.class), any(StatusEnum.class), any(Location.class));
 	}
 	
 	@Test
@@ -88,7 +95,7 @@ public class VehicleTrackServiceTest {
 		Whitebox.setInternalState(vehicleTrackService, "secondsToOfffline", 60);
 		vehicleTrackService.processOffLineVehicle();
 		verify(vehicleTrackRepository, times(0)).save(any(VehicleTrackCache.class));
-		verify(vehicleService, times(0)).updateVehicle(any(String.class), any(StatusEnum.class));
+		verify(vehicleService, times(0)).updateVehicleStatus(any(String.class), any(StatusEnum.class), any(Location.class));
 	}
 	
 	@Test
@@ -97,7 +104,7 @@ public class VehicleTrackServiceTest {
 		Whitebox.setInternalState(vehicleTrackService, "secondsToOfffline", 60);
 		vehicleTrackService.processOffLineVehicle();
 		verify(vehicleTrackRepository, times(0)).save(any(VehicleTrackCache.class));
-		verify(vehicleService, times(0)).updateVehicle(any(String.class), any(StatusEnum.class));
+		verify(vehicleService, times(0)).updateVehicleStatus(any(String.class), any(StatusEnum.class), any(Location.class));
 	}
 	
 	private List<VehicleTrackCache> getListVehicleTrackRandomVehicle(int quantity, int minBefore, int minIniBefore, StatusEnum status){

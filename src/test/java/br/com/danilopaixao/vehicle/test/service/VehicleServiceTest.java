@@ -13,6 +13,7 @@ import org.springframework.web.client.RestTemplate;
 
 import br.com.danilopaixao.vehicle.test.builder.VehicleTestBuilder;
 import br.com.danilopaixao.vehicle.track.enums.StatusEnum;
+import br.com.danilopaixao.vehicle.track.model.Location;
 import br.com.danilopaixao.vehicle.track.model.Vehicle;
 import br.com.danilopaixao.vehicle.track.service.VehicleService;
 
@@ -34,27 +35,27 @@ public class VehicleServiceTest {
 	
 	@Test
 	public void testUpdateVehicleON() throws Exception{
-		vehicleService.updateVehicle(vehicleBuilder.buildRandom(StatusEnum.ON).getVin(), StatusEnum.ON);
+		vehicleService.updateVehicleStatus(vehicleBuilder.buildRandom(StatusEnum.ON).getVin(), StatusEnum.ON, new Location());
 	}
 	
 	@Test
 	public void testUpdateVehicleOFF() throws Exception{
-		vehicleService.updateVehicle(vehicleBuilder.buildRandom(StatusEnum.ON).getVin(), StatusEnum.OFF);
+		vehicleService.updateVehicleStatus(vehicleBuilder.buildRandom(StatusEnum.ON).getVin(), StatusEnum.OFF, new Location());
 	}
 	
 	@Test(expected = IllegalArgumentException.class)
 	public void testUpdateNullVinVehicle() throws Exception{
-		vehicleService.updateVehicle(null, StatusEnum.OFF);
+		vehicleService.updateVehicleStatus(null, StatusEnum.OFF, new Location());
 	}
 	
 	@Test(expected = IllegalArgumentException.class)
 	public void testUpdateNullStatusVehicle() throws Exception{
-		vehicleService.updateVehicle(vehicleBuilder.buildRandom(StatusEnum.ON).getVin(), null);
+		vehicleService.updateVehicleStatus(vehicleBuilder.buildRandom(StatusEnum.ON).getVin(), null, null);
 	}
 	
 	@Test(expected = IllegalArgumentException.class)
 	public void testUpdateNullVehicle() throws Exception{
-		vehicleService.updateVehicle(null, null);
+		vehicleService.updateVehicleStatus(null, null, null);
 	}
 	
 	@Test

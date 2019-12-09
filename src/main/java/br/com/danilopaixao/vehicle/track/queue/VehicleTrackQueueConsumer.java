@@ -47,7 +47,7 @@ public class VehicleTrackQueueConsumer {
       	try {
       		vehicleTrackPayload = jsonMapper.readValue(payload, VehicleTrackCache.class);
       		
-      		VehicleTrackCache vehicleTrackCache = vehicleTrackService.getVehicleTrack(vehicleTrackPayload.getVin());
+      		VehicleTrackCache vehicleTrackCache = vehicleTrackService.getVehicleTrackCache(vehicleTrackPayload.getVin());
       		
       		Vehicle vehicle = null;
       		if(vehicleTrackCache == null) {
@@ -68,21 +68,21 @@ public class VehicleTrackQueueConsumer {
         													StatusEnum.ON, 
         													LocalDateTime.now(), 
         													vehicleTrackPayload.getGeolocation());
-        		//vehicleService.updateVehicle(vehicleTrackPayload.getVin(), StatusEnum.ON);
+        		
         		vehicleTrackService.insertVehicleTrackCache(vehicleTrackCache);
-        		vehicleTrackService.insertVehicleTrack(VehicleTrackMapper
-        								.fromVehicleTrackCache(vehicleTrackCache));
+        		vehicleTrackService.insertVehicleTrack(VehicleTrackMapper.fromVehicleTrackCache(vehicleTrackCache));
         		vehicleSocketService.updateStatusWebSocket(vehicleTrackPayload.getVin(), StatusEnum.ON);
+        		vehicleService.updateVehicleStatus(vehicleTrackPayload.getVin(), StatusEnum.ON, vehicleTrackPayload.getGeolocation());
         	}else{
         		logger.info("###### VehicleTrackQueueConsumer#receive - update cache database, vin {}, status {}", vehicleTrackPayload.getVin(), StatusEnum.ON);
         		vehicleTrackCache.setStatus(StatusEnum.ON);
         		vehicleTrackCache.setDtStatus(LocalDateTime.now());
         		vehicleTrackCache.setGeolocation(vehicleTrackPayload.getGeolocation());
-        		//vehicleService.updateVehicle(vehicleTrackPayload.getVin(), StatusEnum.ON);
+        		
         		vehicleTrackService.saveVehicleTrackCache(vehicleTrackCache);
-        		vehicleTrackService.insertVehicleTrack(VehicleTrackMapper
-										.fromVehicleTrackCache(vehicleTrackCache));
+        		vehicleTrackService.insertVehicleTrack(VehicleTrackMapper.fromVehicleTrackCache(vehicleTrackCache));
         		vehicleSocketService.updateStatusWebSocket(vehicleTrackPayload.getVin(), StatusEnum.ON);
+        		vehicleService.updateVehicleStatus(vehicleTrackPayload.getVin(), StatusEnum.ON, vehicleTrackPayload.getGeolocation());
         	}
         	logger.info("###### VehicleTrackQueueConsumer#receive: end of process");        	
 		} catch (Exception e) {

@@ -14,12 +14,12 @@ public final class VehicleTrackMapper {
 												vehicle.getDtStatus(), 
 												vehicle.getGeolocation());
 		
-		public static final VehicleTrack fromVehicleTrackCache(VehicleTrackCache vehicle) {
-			return new VehicleTrack(vehicle.getVin(), 
-					vehicle.getQueue(), 
-					vehicle.getStatus(), 
-					vehicle.getDtStatus(), 
-					vehicle.getGeolocation());
-		}
+	public static final VehicleTrack fromVehicleTrackCache(VehicleTrackCache vehicle) {
+		return new VehicleTrack(vehicle.getVin(), 
+				vehicle.getQueue(), 
+				vehicle.getStatus(), 
+				vehicle.getDtStatus(), 
+				vehicle.getGeolocation());
+	}
 
 }

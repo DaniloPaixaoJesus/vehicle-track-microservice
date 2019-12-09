@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 import org.apache.commons.lang.RandomStringUtils;
 
 import br.com.danilopaixao.vehicle.track.enums.StatusEnum;
+import br.com.danilopaixao.vehicle.track.model.Location;
 import br.com.danilopaixao.vehicle.track.model.VehicleTrackCache;
 
 public class VehicleTrackTestBuilder {
@@ -16,7 +17,7 @@ public class VehicleTrackTestBuilder {
 	private LocalDateTime dateTime = LocalDateTime.now();;
 	
 	public VehicleTrackCache build() {
-		return new VehicleTrackCache(vin, queue, status, dtStatus, null);
+		return new VehicleTrackCache(vin, queue, status, dtStatus, new Location());
 	}
 	
 	public VehicleTrackCache buildRandom(int minBefore, int minIniBefore, StatusEnum status) {
@@ -24,7 +25,7 @@ public class VehicleTrackTestBuilder {
 						   RandomStringUtils.random(15, true, false),
 						   status,
 						   dateTime.plusMinutes(minBefore),
-						   null
+						   new Location()
 						   );
 	}
 	

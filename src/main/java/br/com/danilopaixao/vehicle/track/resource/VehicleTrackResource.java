@@ -41,7 +41,7 @@ public class VehicleTrackResource {
 				produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
 	@ResponseStatus(HttpStatus.OK)
 	public VehicleTrackCache getVehicleTrack(@PathVariable("vin") final String vin) {
-		return service.getVehicleTrack(vin);
+		return service.getVehicleTrackCache(vin);
 	}
 	
 	@PostMapping(value = "")

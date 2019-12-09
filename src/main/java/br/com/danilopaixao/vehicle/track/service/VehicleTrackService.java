@@ -45,9 +45,6 @@ public class VehicleTrackService {
 	@Autowired
 	private VehicleService vehicleService;
 	
-	@Autowired
-	private VehicleTrackService vehicleTrackService;
-	
 	@Value("${queue.vehicle.track.name}")
 	private String queueVehicleTrackName;
 	
@@ -71,12 +68,12 @@ public class VehicleTrackService {
 						vehicleTrack.setStatus(StatusEnum.OFF);
 						vehicleTrack.setDtStatus(LocalDateTime.now());
 						this.saveVehicleTrackCache(vehicleTrack);
-						vehicleTrackService.insertVehicleTrack(new VehicleTrack(vehicleTrack.getVin(), 
+						this.insertVehicleTrack(new VehicleTrack(vehicleTrack.getVin(), 
 																	queueVehicleTrackName, 
 																	StatusEnum.OFF, 
 																	LocalDateTime.now(), 
 																	vehicleTrack.getGeolocation()));
-						vehicleService.updateVehicle(vehicleTrack.getVin(), StatusEnum.OFF);
+						vehicleService.updateVehicleStatus(vehicleTrack.getVin(), StatusEnum.OFF, vehicleTrack.getGeolocation());
 					}
 				}
 			});
@@ -101,7 +98,7 @@ public class VehicleTrackService {
 		return vehicleTrackMongoRepository.save(vehicleTrack);
 	}
 	
-	public VehicleTrackCache getVehicleTrack(String vin) {
+	public VehicleTrackCache getVehicleTrackCache(String vin) {
 		logger.info("##VehicleTrackService##getVehicleTrack: {}", vin);
 		//TODO: use Optional class
 		return vehicleTrackRedisRepository.findById(vin).orElse(null);

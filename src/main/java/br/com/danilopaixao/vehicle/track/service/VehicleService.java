@@ -12,6 +12,7 @@ import com.netflix.hystrix.contrib.javanica.annotation.HystrixCommand;
 import com.netflix.hystrix.contrib.javanica.annotation.HystrixProperty;
 
 import br.com.danilopaixao.vehicle.track.enums.StatusEnum;
+import br.com.danilopaixao.vehicle.track.model.Location;
 import br.com.danilopaixao.vehicle.track.model.Vehicle;
 import br.com.danilopaixao.vehicle.track.model.VehicleList;
 
@@ -73,7 +74,7 @@ public class VehicleService {
 	}
 	
 	
-	@HystrixCommand(fallbackMethod ="updateVehicleFallBack",
+	@HystrixCommand(fallbackMethod ="updateVehicleStatusFallBack",
 			threadPoolKey = "updateVehicleThreadPool",
 			threadPoolProperties = {
 					@HystrixProperty(name = "coreSize", value = "75"),
@@ -86,18 +87,19 @@ public class VehicleService {
 				@HystrixProperty(name = "circuitBreaker.sleepWindowInMilliseconds", value = "5000")
 			}
 	)
-	public void updateVehicle(final String vin, StatusEnum status) {
+	public void updateVehicleStatus(final String vin, StatusEnum status, Location location) {
 		if(StringUtils.isEmpty(vin)
-				|| StringUtils.isEmpty(status)) {
-			logger.error("invalid argument ##VehicleService#updateVehicle({}, {})", vin, status);
-			throw new IllegalArgumentException("");
+				|| StringUtils.isEmpty(status)
+				|| StringUtils.isEmpty(location)) {
+			logger.error("invalid argument ##VehicleService#updateVehicle({}, {}, {})", vin, status, location);
+			throw new IllegalArgumentException("location, vin or status null");
 		}
-		logger.info("##VehicleService#updateVehicle({}, {})", vin, status);
-		String url = vehicleRestApiUrl+"/vehicles/"+vin+"/status";
-		restTemplate.put(url, status.toString());
+		logger.info("##VehicleService#updateVehicle({}, {}, {})", vin, status, location);
+		String url = vehicleRestApiUrl+"/vehicles/"+vin+"/status/"+status;
+		restTemplate.put(url, location);
 	}
-	public void updateVehicleFallBack(final String vin, StatusEnum status) {
-		logger.error("error vehicle rest service ##VehicleService#updateVehicleFallBack({}, {})", vin, status);
+	public void updateVehicleStatusFallBack(final String vin, StatusEnum status, Location location) {
+		logger.error("error vehicle rest service ##VehicleService#updateVehicleFallBack({}, {}, {})", vin, status, location);
 	}
 	
 }

@@ -19,6 +19,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import br.com.danilopaixao.vehicle.test.builder.VehicleTestBuilder;
 import br.com.danilopaixao.vehicle.test.builder.VehicleTrackTestBuilder;
 import br.com.danilopaixao.vehicle.track.enums.StatusEnum;
+import br.com.danilopaixao.vehicle.track.model.Location;
 import br.com.danilopaixao.vehicle.track.model.Vehicle;
 import br.com.danilopaixao.vehicle.track.model.VehicleTrackCache;
 import br.com.danilopaixao.vehicle.track.queue.VehicleTrackQueueConsumer;
@@ -58,14 +59,16 @@ public class VehicleTrackQueueConsumerTest {
 	
 	@Test
 	public void testNoVehicle() throws Exception{
+		when(vehicleTrackService.getVehicleTrackCache(any(String.class))).thenReturn(null);
 		when(vehicleService.getVehicle(any(String.class))).thenReturn(null);
 		
 		vehicleTrackQueueConsumer.receive(getJson(vehicleTrackBuilder.buildRandom(0, 0, StatusEnum.ON)));
 		
-		verify(vehicleTrackService, times(0)).getVehicleTrack(any(String.class));
+		verify(vehicleTrackService, times(1)).getVehicleTrackCache(any(String.class));
+		verify(vehicleService, times(1)).getVehicle(any(String.class));
 		verify(vehicleTrackService, times(0)).insertVehicleTrackCache(any(VehicleTrackCache.class));
 		verify(vehicleTrackService, times(0)).saveVehicleTrackCache(any(VehicleTrackCache.class));
-		verify(vehicleService, times(0)).updateVehicle(any(String.class), any(StatusEnum.class));
+		verify(vehicleService, times(0)).updateVehicleStatus(any(String.class), any(StatusEnum.class), any(Location.class));
 	}
 	
 	@Test
@@ -73,28 +76,27 @@ public class VehicleTrackQueueConsumerTest {
 		Vehicle vehicleFound = vehicleBuilder.buildRandom(StatusEnum.ON);
 		VehicleTrackCache vehicleTrackFound = vehicleTrackBuilder.buildRandom(0, 0, StatusEnum.ON);
 		vehicleTrackFound.setVin(vehicleFound.getVin());
-		when(vehicleService.getVehicle(vehicleFound.getVin())).thenReturn(vehicleFound);
-		when(vehicleTrackService.getVehicleTrack(vehicleFound.getVin())).thenReturn(vehicleTrackFound);
+		when(vehicleTrackService.getVehicleTrackCache(vehicleFound.getVin())).thenReturn(vehicleTrackFound);
 		
 		vehicleTrackQueueConsumer.receive(getJson(vehicleTrackFound));
 
 		verify(vehicleTrackService, times(0)).insertVehicleTrackCache(any(VehicleTrackCache.class));
-		verify(vehicleTrackService, times(0)).saveVehicleTrackCache(any(VehicleTrackCache.class));
-		verify(vehicleService, times(0)).updateVehicle(any(String.class), any(StatusEnum.class));
+		verify(vehicleTrackService, times(1)).saveVehicleTrackCache(any(VehicleTrackCache.class));
+		verify(vehicleService, times(1)).updateVehicleStatus(any(String.class), any(StatusEnum.class), any(Location.class));
 	}
 	
 	@Test
 	public void testOfflineVehicleNoCache() throws Exception{
 		Vehicle vehicleFound = vehicleBuilder.buildRandom(StatusEnum.OFF);
 		when(vehicleService.getVehicle(vehicleFound.getVin())).thenReturn(vehicleFound);
-		when(vehicleTrackService.getVehicleTrack(any(String.class))).thenReturn(null);
+		when(vehicleTrackService.getVehicleTrackCache(any(String.class))).thenReturn(null);
 		
 		VehicleTrackCache vehicleTrackPayload = vehicleTrackBuilder.setVin(vehicleFound.getVin()).build();
 		vehicleTrackQueueConsumer.receive(getJson(vehicleTrackPayload));
 		
 		verify(vehicleTrackService, times(1)).insertVehicleTrackCache(any(VehicleTrackCache.class));
-		verify(vehicleService, times(1)).updateVehicle(vehicleTrackPayload.getVin(), StatusEnum.ON);
-		verify(vehicleService, times(0)).updateVehicle(vehicleTrackPayload.getVin(), StatusEnum.OFF);
+		verify(vehicleService, times(1)).updateVehicleStatus(vehicleTrackPayload.getVin(), StatusEnum.ON, vehicleTrackPayload.getGeolocation());
+		verify(vehicleService, times(0)).updateVehicleStatus(vehicleTrackPayload.getVin(), StatusEnum.OFF, vehicleTrackPayload.getGeolocation());
 		verify(vehicleTrackService, times(0)).saveVehicleTrackCache(any(VehicleTrackCache.class));
 	}
 	
@@ -103,8 +105,7 @@ public class VehicleTrackQueueConsumerTest {
 		Vehicle vehicleFound = vehicleBuilder.buildRandom(StatusEnum.ON);
 		VehicleTrackCache vehicleTrackFournd = vehicleTrackBuilder.buildRandom(0, 0, StatusEnum.OFF);
 		vehicleTrackFournd.setVin(vehicleFound.getVin());
-		when(vehicleService.getVehicle(vehicleFound.getVin())).thenReturn(vehicleFound);
-		when(vehicleTrackService.getVehicleTrack(vehicleTrackFournd.getVin())).thenReturn(vehicleTrackFournd);
+		when(vehicleTrackService.getVehicleTrackCache(vehicleTrackFournd.getVin())).thenReturn(vehicleTrackFournd);
 		
 		vehicleTrackQueueConsumer.receive(getJson(
 												new VehicleTrackTestBuilder()
@@ -112,7 +113,7 @@ public class VehicleTrackQueueConsumerTest {
 														.build()));
 		
 		verify(vehicleTrackService, times(0)).insertVehicleTrackCache(vehicleTrackFournd);
-		verify(vehicleService, times(1)).updateVehicle(vehicleTrackFournd.getVin(), StatusEnum.ON);
+		//verify(vehicleService, times(1)).updateVehicleStatus(vehicleTrackFournd.getVin(), StatusEnum.ON, any(Location.class));
 		verify(vehicleTrackService, times(1)).saveVehicleTrackCache(vehicleTrackFournd);
 	}
 	
