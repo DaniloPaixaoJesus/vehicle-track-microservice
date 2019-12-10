@@ -3,6 +3,9 @@ package br.com.danilopaixao.vehicle.track.model;
 import java.io.Serializable;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class VehicleList implements Serializable{
 	
 	/**
@@ -14,9 +17,9 @@ public class VehicleList implements Serializable{
 	
 	public VehicleList() {}
 	
-	public VehicleList(List<Vehicle> driverList) {
+	public VehicleList(List<Vehicle> vehicleList) {
 		super();
-		this.setVehicleList(driverList);
+		this.setVehicleList(vehicleList);
 	}
 
 	public List<Vehicle> getVehicleList() {

@@ -30,11 +30,39 @@ public class VehicleTrackResource {
 	@Autowired
 	private VehicleTrackService service;
 	
+	@PostMapping(value="/restore-redis", 
+			produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+	@ResponseStatus(HttpStatus.OK)
+	public Iterable<VehicleTrackCache> restoreRedis() {
+		service.loadRedisDataFromMongo();
+		return service.findAllVehicleTrackCache();
+	}
+	
 	@GetMapping(value="", 
+			produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+	@ResponseStatus(HttpStatus.OK)
+	public List<VehicleTrack> findAllVehiclesTrack() {
+		return service.findAllVehicleTrack();
+	}
+	
+	@GetMapping(value="/{vin}", 
+			produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+	@ResponseStatus(HttpStatus.OK)
+	public List<VehicleTrack> findVehiclesTrackByVin(@PathVariable("vin") final String vin) {
+		return service.findVehicleTrackByVin(vin);
+	}
+	
+	@GetMapping(value="/cache", 
 				produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
 	@ResponseStatus(HttpStatus.OK)
-	public Iterable<VehicleTrackCache> findAll() {
+	public Iterable<VehicleTrackCache> findAllVehiclesTrackCache() {
 		return service.findAllVehicleTrackCache();
+	}
+	
+	@PostMapping(value = "/cache",
+				 produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+	public VehicleTrackCache insertNewVehicleTrack(@RequestBody(required = true) final VehicleTrackCache vehicleTrack) {
+		return service.insertVehicleTrackCache(vehicleTrack);
 	}
 	
 	@GetMapping(value = "/queue/{vin}", 
@@ -44,10 +72,6 @@ public class VehicleTrackResource {
 		return service.getVehicleTrackCache(vin);
 	}
 	
-	@PostMapping(value = "")
-	public VehicleTrackCache insertNewVehicleTrack(@RequestBody(required = true) final VehicleTrackCache vehicleTrack) {
-		return service.insertVehicleTrackCache(vehicleTrack);
-	}
 	
 	@GetMapping(value = "/near/{latitude}/{longitude}/{distance}")
 	public List<VehicleTrack> findNearest(@PathVariable("latitude") final double latitude, 

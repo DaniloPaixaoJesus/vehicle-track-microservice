@@ -32,12 +32,12 @@ public class VehicleTrackQueueConsumer {
 	private VehicleTrackService vehicleTrackService;
 	
 	@Autowired
-	private VehicleSocketService vehicleSocketService;
+	private VehicleSocketService vehicleWebSocketService;
 	
-	@Value("${queue.vehicle.track.name}")
+	@Value("${queue.vehicle.track}")
 	private String queueVehicleTrackName;
 	
-    @RabbitListener(queues = {"${queue.vehicle.track.name}"})
+    @RabbitListener(queues = {"${queue.vehicle.track}"})
     public void receive(@Payload String payload) {
     	
     	logger.info("###### VehicleTrackQueueConsumer#receive:{}", payload);
@@ -71,7 +71,7 @@ public class VehicleTrackQueueConsumer {
         		
         		vehicleTrackService.insertVehicleTrackCache(vehicleTrackCache);
         		vehicleTrackService.insertVehicleTrack(VehicleTrackMapper.fromVehicleTrackCache(vehicleTrackCache));
-        		vehicleSocketService.updateStatusWebSocket(vehicleTrackPayload.getVin(), StatusEnum.ON);
+        		vehicleWebSocketService.updateStatusWebSocket(vehicleTrackPayload.getVin(), StatusEnum.ON);
         		vehicleService.updateVehicleStatus(vehicleTrackPayload.getVin(), StatusEnum.ON, vehicleTrackPayload.getGeolocation());
         	}else{
         		logger.info("###### VehicleTrackQueueConsumer#receive - update cache database, vin {}, status {}", vehicleTrackPayload.getVin(), StatusEnum.ON);
@@ -81,7 +81,7 @@ public class VehicleTrackQueueConsumer {
         		
         		vehicleTrackService.saveVehicleTrackCache(vehicleTrackCache);
         		vehicleTrackService.insertVehicleTrack(VehicleTrackMapper.fromVehicleTrackCache(vehicleTrackCache));
-        		vehicleSocketService.updateStatusWebSocket(vehicleTrackPayload.getVin(), StatusEnum.ON);
+        		vehicleWebSocketService.updateStatusWebSocket(vehicleTrackPayload.getVin(), StatusEnum.ON);
         		vehicleService.updateVehicleStatus(vehicleTrackPayload.getVin(), StatusEnum.ON, vehicleTrackPayload.getGeolocation());
         	}
         	logger.info("###### VehicleTrackQueueConsumer#receive: end of process");        	

@@ -4,10 +4,8 @@ import java.time.LocalDateTime;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.amqp.core.Queue;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -24,43 +22,43 @@ public class VehicleTrackQueueSender {
 	
 	private static final Logger logger = LoggerFactory.getLogger(VehicleTrackQueueSender.class);
 	
- 
     @Autowired
     private RabbitTemplate rabbitTemplate;
  
-    @Value("${queue.vehicle.track.name}")
+    @Value("${queue.vehicle.track}")
     private String vehicleTrackQueueName;
     
-    @Autowired
-    @Qualifier("${queue.vehicle.track.name}")
-    private Queue queueVehicleTrack;
+    @Value("${queue.vehicle.service.update}")
+    private String queueVehicleServiceUpdate;
     
-    @Autowired
-    @Qualifier("${queue.vehicle.service.update}")
-    private Queue queueVehicleServiceUpdate;
+//    @Autowired
+//    @Qualifier("${queue.vehicle.track}")
+//    private Queue queueVehicleTrack;
+//    
+//    @Autowired
+//    @Qualifier("${queue.vehicle.service.update}")
+//    private Queue queueVehicleServiceUpdate;
  
     public VehicleTrackCache sendToQueueOnlineStatus(final String vin, double[] position ) throws JsonProcessingException {
     	logger.info("###### VehicleTrackQueueSender#sendQueue:{}", vin);
-    	
     	ObjectMapper jsonMapper = new ObjectMapper();
     	VehicleTrackCache vehicleTrackCache = new VehicleTrackCache(vin, vehicleTrackQueueName, 
     																StatusEnum.ON, 
     																LocalDateTime.now(), 
     																new Location(position[0], position[1]));
     	 String payload = jsonMapper.writeValueAsString(vehicleTrackCache);
-        rabbitTemplate.convertAndSend(this.queueVehicleTrack.getName(), payload);
+        rabbitTemplate.convertAndSend(vehicleTrackQueueName, payload);
         return vehicleTrackCache;
     }
     
-    public void sendToVehicleQueue(final String vin, StatusEnum status, Location location) throws JsonProcessingException {
-    	logger.info("###### VehicleTrackQueueSender#sendToVehicleQueue:{}, {}, {}", vin, status, location);
-    	
+    public void sendToVehicleServiceQueue(final String vin, StatusEnum status, Location location) throws JsonProcessingException{
+    	logger.info("###### VehicleTrackQueueSender#sendToVehicleServiceQueue:{}, {}, {}", vin, status, location);
     	ObjectMapper jsonMapper = new ObjectMapper();
     	VehicleTrack vehicleTrack = new VehicleTrack(vin, vehicleTrackQueueName, 
     																StatusEnum.ON, 
     																LocalDateTime.now(), 
     																location);
     	 String payload = jsonMapper.writeValueAsString(vehicleTrack);
-        rabbitTemplate.convertAndSend(this.queueVehicleServiceUpdate.getName(), payload);
+    	 rabbitTemplate.convertAndSend(queueVehicleServiceUpdate, payload);
     }
 }

@@ -6,6 +6,7 @@ import java.time.LocalDateTime;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.redis.core.RedisHash;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import br.com.danilopaixao.vehicle.track.config.LocalDateTimeDeserializer;
@@ -14,6 +15,7 @@ import br.com.danilopaixao.vehicle.track.config.LocalDateTimeSerializer;
 import br.com.danilopaixao.vehicle.track.enums.StatusEnum;
 import br.com.danilopaixao.vehicle.track.utils.DateTimeUtils;
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 @RedisHash("VehicleTrackCache1")
 public class VehicleTrackCache implements Serializable {
 

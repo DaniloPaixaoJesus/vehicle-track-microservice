@@ -2,8 +2,11 @@ package br.com.danilopaixao.vehicle.track.model;
 
 import java.io.Serializable;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import br.com.danilopaixao.vehicle.track.enums.StatusEnum;
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class Vehicle implements Serializable{
 	
 	/**
@@ -16,8 +19,20 @@ public class Vehicle implements Serializable{
 	private String name;
 	private String driverId;
 	private StatusEnum status;
+	private VehicleTrack vehicleTrack;
 
 	public Vehicle() {}
+	
+	public Vehicle(String vin, String regNumber, String name, StatusEnum status, 
+						String driverId, VehicleTrack vehicleTrack) {
+		super();
+		this.vin = vin;
+		this.regNumber = regNumber;
+		this.name = name;
+		this.status = status;
+		this.driverId = driverId;
+		this.vehicleTrack = vehicleTrack;
+	}
 
 	public Vehicle(String vin, String regNumber, String name, StatusEnum status, String driverId) {
 		super();
@@ -67,6 +82,14 @@ public class Vehicle implements Serializable{
 
 	public void setStatus(StatusEnum status) {
 		this.status = status;
+	}
+	
+	public VehicleTrack getVehicleTrack() {
+		return vehicleTrack;
+	}
+
+	public void setVehicleTrack(VehicleTrack vehicleTrack) {
+		this.vehicleTrack = vehicleTrack;
 	}
 
 	@Override

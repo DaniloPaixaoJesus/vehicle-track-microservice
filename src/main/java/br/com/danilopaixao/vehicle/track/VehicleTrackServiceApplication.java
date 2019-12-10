@@ -4,7 +4,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.springframework.amqp.core.Queue;
 import org.springframework.amqp.rabbit.annotation.EnableRabbit;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
@@ -31,12 +30,6 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 @EnableRabbit
 @EnableScheduling
 public class VehicleTrackServiceApplication {
-	
-	@Value("${queue.vehicle.track.name}")
-    private String vehicleTrackQueue;
-	
-	@Value("${queue.vehicle.service.update}")
-	private String vehicleserviceUpdateQueue;
 	
 	@Value("${spring.redis.host}")
     private String REDIS_HOST;
@@ -99,14 +92,14 @@ public class VehicleTrackServiceApplication {
         return template;
     }
     
-    @Bean("${queue.vehicle.track.name}")
-    public Queue queueVehicleTrack() {
-        return new Queue(vehicleTrackQueue, true);
-    }
-    
-    @Bean("${queue.vehicle.service.update}")
-    public Queue queueVehicleUpdate() {
-        return new Queue(vehicleserviceUpdateQueue, true);
-    }
+//    @Bean("${queue.vehicle.track}")
+//    public Queue queueVehicleTrack() {
+//        return new Queue(vehicleTrackQueue, true);
+//    }
+//    
+//    @Bean("${queue.vehicle.service.update}")
+//    public Queue queueVehicleUpdate() {
+//        return new Queue(vehicleserviceUpdateQueue, true);
+//    }
 
 }

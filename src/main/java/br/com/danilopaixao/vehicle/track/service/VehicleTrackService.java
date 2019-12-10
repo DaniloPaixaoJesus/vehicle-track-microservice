@@ -45,7 +45,7 @@ public class VehicleTrackService {
 	@Autowired
 	private VehicleService vehicleService;
 	
-	@Value("${queue.vehicle.track.name}")
+	@Value("${queue.vehicle.track}")
 	private String queueVehicleTrackName;
 	
 	@Scheduled(cron = "0/59 * * * * ?")
@@ -86,7 +86,7 @@ public class VehicleTrackService {
 		if( vehicleList == null
 				|| vehicleList.getVehicleList() == null
 				|| vehicleList.getVehicleList().isEmpty()) {
-			logger.info("##Execution offline vehicle routine: NO VEHICLE");
+			logger.info("##Execution loadRedisDataFromMongo - load vehicle from Vehicle Service routine: NO VEHICLE");
 			return;	
 		}
 		Iterable<VehicleTrackCache> listVehicleTrackCache = toVehicleTrackCache(vehicleList.getVehicleList());
@@ -130,6 +130,14 @@ public class VehicleTrackService {
 		logger.info("##VehicleTrackService##getVehicleTrack: {}", vin);
 		//TODO: use Optional class
 		return vehicleTrackRedisRepository.findById(vin).orElse(null);
+	}
+	
+	public List<VehicleTrack> findVehicleTrackByVin(String vin) {
+		return vehicleTrackMongoRepository.findByVin(vin);
+	}
+	
+	public List<VehicleTrack> findAllVehicleTrack() {
+		return vehicleTrackMongoRepository.findAll();
 	}
 	
 	public Iterable<VehicleTrackCache> findAllVehicleTrackCache() {

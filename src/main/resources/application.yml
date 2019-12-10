@@ -27,8 +27,7 @@ queue:
   vehicle:
     service:
       update: ${VEHICLE_SERVICE_UPDATE_QUEUE:VehicleQueue}
-    track:
-      name: ${VEHICLE_TRACK_QUEUE:VehicleTrackQueue} 
+    track: ${VEHICLE_TRACK_QUEUE:VehicleTrackQueue} 
 server:
   port: 8080
 eureka:

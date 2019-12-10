@@ -2,9 +2,11 @@ package br.com.danilopaixao.vehicle.track.model;
 
 import java.io.Serializable;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import br.com.danilopaixao.vehicle.track.enums.StatusEnum;
 
-
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class VehicleTrackWSocket implements Serializable{
 
 	/**
