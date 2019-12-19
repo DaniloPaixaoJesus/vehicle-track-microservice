@@ -67,7 +67,7 @@ public class VehicleTrackQueueConsumerTest {
 		verify(vehicleTrackService, times(1)).getVehicleTrackCache(any(String.class));
 		verify(vehicleService, times(1)).getVehicle(any(String.class));
 		verify(vehicleTrackService, times(0)).insertVehicleTrackCache(any(VehicleTrackCache.class));
-		verify(vehicleTrackService, times(0)).saveVehicleTrackCache(any(VehicleTrackCache.class));
+		verify(vehicleTrackService, times(0)).updateVehicleTrackCache(any(VehicleTrackCache.class));
 		verify(vehicleService, times(0)).updateVehicleStatus(any(String.class), any(StatusEnum.class), any(Location.class));
 	}
 	
@@ -81,7 +81,7 @@ public class VehicleTrackQueueConsumerTest {
 		vehicleTrackQueueConsumer.receive(getJson(vehicleTrackFound));
 
 		verify(vehicleTrackService, times(0)).insertVehicleTrackCache(any(VehicleTrackCache.class));
-		verify(vehicleTrackService, times(1)).saveVehicleTrackCache(any(VehicleTrackCache.class));
+		verify(vehicleTrackService, times(1)).updateVehicleTrackCache(any(VehicleTrackCache.class));
 		verify(vehicleService, times(1)).updateVehicleStatus(any(String.class), any(StatusEnum.class), any(Location.class));
 	}
 	
@@ -97,7 +97,7 @@ public class VehicleTrackQueueConsumerTest {
 		verify(vehicleTrackService, times(1)).insertVehicleTrackCache(any(VehicleTrackCache.class));
 		verify(vehicleService, times(1)).updateVehicleStatus(vehicleTrackPayload.getVin(), StatusEnum.ON, vehicleTrackPayload.getGeolocation());
 		verify(vehicleService, times(0)).updateVehicleStatus(vehicleTrackPayload.getVin(), StatusEnum.OFF, vehicleTrackPayload.getGeolocation());
-		verify(vehicleTrackService, times(0)).saveVehicleTrackCache(any(VehicleTrackCache.class));
+		verify(vehicleTrackService, times(0)).updateVehicleTrackCache(any(VehicleTrackCache.class));
 	}
 	
 	@Test
@@ -114,7 +114,7 @@ public class VehicleTrackQueueConsumerTest {
 		
 		verify(vehicleTrackService, times(0)).insertVehicleTrackCache(vehicleTrackFournd);
 		//verify(vehicleService, times(1)).updateVehicleStatus(vehicleTrackFournd.getVin(), StatusEnum.ON, any(Location.class));
-		verify(vehicleTrackService, times(1)).saveVehicleTrackCache(vehicleTrackFournd);
+		verify(vehicleTrackService, times(1)).updateVehicleTrackCache(vehicleTrackFournd);
 	}
 	
 	private String getJson(VehicleTrackCache v) throws Exception {

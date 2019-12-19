@@ -8,6 +8,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.geo.Metrics;
+import org.springframework.data.geo.Point;
+import org.springframework.data.geo.Distance;
+import org.springframework.data.geo.Circle;
+import org.springframework.data.geo.Distance;
+import org.springframework.data.geo.Metrics;
+import org.springframework.data.geo.Point;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
@@ -67,7 +74,7 @@ public class VehicleTrackService {
 						logger.info("vin status OFF:"+vehicleTrack.getVin());
 						vehicleTrack.setStatus(StatusEnum.OFF);
 						vehicleTrack.setDtStatus(LocalDateTime.now());
-						this.saveVehicleTrackCache(vehicleTrack);
+						this.updateVehicleTrackCache(vehicleTrack);
 						this.insertVehicleTrack(new VehicleTrack(vehicleTrack.getVin(), 
 																	queueVehicleTrackName, 
 																	StatusEnum.OFF, 
@@ -103,12 +110,20 @@ public class VehicleTrackService {
 						vehicleService.updateVehicleStatus(vehicleTrackCache.getVin(), StatusEnum.OFF, vehicleTrackCache.getGeolocation());
 					}
 				}
-				this.saveVehicleTrackCache(vehicleTrackCache);
+				this.updateVehicleTrackCache(vehicleTrackCache);
 			});
 	}
 
 	public List<VehicleTrack> findNearest(double latitude, double longitude, double distance) {
 		return vehicleTrackMongoRepository2.findNearest(latitude, longitude, distance);
+	}
+	
+	public List<VehicleTrack> findNearest2(double latitude, double longitude, double distance) {
+		
+		Point point = new Point(latitude, longitude);
+		Distance radious = new Distance(distance, Metrics.KILOMETERS);
+		Circle circle = new Circle(point, radious);
+		return vehicleTrackMongoRepository.findByGeolocationWithin(circle);
 	}
 	
 	public VehicleTrackCache insertIntoQueueOnlineStatus(String vin, double[] position) throws Throwable {
@@ -144,7 +159,7 @@ public class VehicleTrackService {
 		return vehicleTrackRedisRepository.findAll();
 	}
 
-	public VehicleTrackCache saveVehicleTrackCache(VehicleTrackCache vehicleTrackCache) {
+	public VehicleTrackCache updateVehicleTrackCache(VehicleTrackCache vehicleTrackCache) {
 		logger.info("##VehicleTrackService##save: {}/{}", vehicleTrackCache.getVin(), vehicleTrackCache.getStatus());
 		return vehicleTrackRedisRepository.save(vehicleTrackCache);
 	}

@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ResponseStatusException;
 
 import br.com.danilopaixao.vehicle.track.model.VehicleTrack;
 import br.com.danilopaixao.vehicle.track.model.VehicleTrackCache;
@@ -49,7 +50,13 @@ public class VehicleTrackResource {
 			produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
 	@ResponseStatus(HttpStatus.OK)
 	public List<VehicleTrack> findVehiclesTrackByVin(@PathVariable("vin") final String vin) {
-		return service.findVehicleTrackByVin(vin);
+		List<VehicleTrack> r = service.findVehicleTrackByVin(vin);
+		if(r == null 
+				|| r.isEmpty()) {
+			throw new ResponseStatusException(
+			          HttpStatus.NOT_FOUND, "vin not found");
+		}
+		return r;
 	}
 	
 	@GetMapping(value="/cache", 
@@ -57,6 +64,18 @@ public class VehicleTrackResource {
 	@ResponseStatus(HttpStatus.OK)
 	public Iterable<VehicleTrackCache> findAllVehiclesTrackCache() {
 		return service.findAllVehicleTrackCache();
+	}
+	
+	@GetMapping(value="/cache/{vin}", 
+			produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+	@ResponseStatus(HttpStatus.OK)
+	public VehicleTrackCache findVehiclesTrackCacheByVin(@PathVariable("vin") final String vin) {
+		VehicleTrackCache r = service.getVehicleTrackCache(vin);
+		if(r == null ) {
+			throw new ResponseStatusException(
+			          HttpStatus.NOT_FOUND, "vin not found");
+		}
+		return r;
 	}
 	
 	@PostMapping(value = "/cache",
@@ -69,7 +88,12 @@ public class VehicleTrackResource {
 				produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
 	@ResponseStatus(HttpStatus.OK)
 	public VehicleTrackCache getVehicleTrack(@PathVariable("vin") final String vin) {
-		return service.getVehicleTrackCache(vin);
+		VehicleTrackCache r = service.getVehicleTrackCache(vin);
+		if(r == null ) {
+			throw new ResponseStatusException(
+			          HttpStatus.NOT_FOUND, "vin not found");
+		}
+		return r;
 	}
 	
 	
@@ -77,6 +101,12 @@ public class VehicleTrackResource {
 	public List<VehicleTrack> findNearest(@PathVariable("latitude") final double latitude, 
 			@PathVariable("longitude") final double longitude, @PathVariable("distance") final double distance) {
 		return service.findNearest(latitude, longitude, distance);
+	}
+	
+	@GetMapping(value = "/near2/{latitude}/{longitude}/{distance}")
+	public List<VehicleTrack> findNearest2(@PathVariable("latitude") final double latitude, 
+			@PathVariable("longitude") final double longitude, @PathVariable("distance") final double distance) {
+		return service.findNearest2(latitude, longitude, distance);
 	}
 	
 	@PutMapping("/{vin}/{lat}/{lon}")

@@ -79,7 +79,7 @@ public class VehicleTrackQueueConsumer {
         		vehicleTrackCache.setDtStatus(LocalDateTime.now());
         		vehicleTrackCache.setGeolocation(vehicleTrackPayload.getGeolocation());
         		
-        		vehicleTrackService.saveVehicleTrackCache(vehicleTrackCache);
+        		vehicleTrackService.updateVehicleTrackCache(vehicleTrackCache);
         		vehicleTrackService.insertVehicleTrack(VehicleTrackMapper.fromVehicleTrackCache(vehicleTrackCache));
         		vehicleWebSocketService.updateStatusWebSocket(vehicleTrackPayload.getVin(), StatusEnum.ON);
         		vehicleService.updateVehicleStatus(vehicleTrackPayload.getVin(), StatusEnum.ON, vehicleTrackPayload.getGeolocation());
