@@ -15,6 +15,7 @@ import br.com.danilopaixao.vehicle.test.builder.VehicleTestBuilder;
 import br.com.danilopaixao.vehicle.track.enums.StatusEnum;
 import br.com.danilopaixao.vehicle.track.model.Location;
 import br.com.danilopaixao.vehicle.track.model.Vehicle;
+import br.com.danilopaixao.vehicle.track.queue.VehicleTrackQueueSender;
 import br.com.danilopaixao.vehicle.track.service.VehicleService;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -25,6 +26,9 @@ public class VehicleServiceTest {
 	
 	@Mock
 	private RestTemplate restTemplate;
+	
+	@Mock
+	private VehicleTrackQueueSender vehicleTrackQueueSender;
 	
 	private VehicleTestBuilder vehicleBuilder;
 	
