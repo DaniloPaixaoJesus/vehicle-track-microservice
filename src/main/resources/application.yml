@@ -29,7 +29,7 @@ queue:
       update: ${VEHICLE_SERVICE_UPDATE_QUEUE:VehicleQueue}
     track: ${VEHICLE_TRACK_QUEUE:VehicleTrackQueue} 
 server:
-  port: 8080
+  port: ${SERVER_PORT:8080}
 eureka:
   client:
     enabled: ${EUREKA_ENABLE:false}
@@ -45,4 +45,4 @@ br:
         timelimiteminutes: 240 
       service:
         vehicle:
-          url: ${VEHICLE_SERVICE_URL:http://vehicle-service/v1/}
+          url: ${VEHICLE_SERVICE_URL:http://vehicle-service/v1}

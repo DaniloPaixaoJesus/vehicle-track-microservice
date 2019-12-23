@@ -17,12 +17,11 @@ public class VehicleTestBuilder {
 		return new Vehicle(RandomStringUtils.random(25, true, true), 
 						   RandomStringUtils.random(15, true, true),
 						   RandomStringUtils.random(10, true, false), 
-						   status,
-						   RandomStringUtils.random(15, true, true));
+						   status);
 	}
 	
 	public Vehicle build() {
-		return new Vehicle(vin, regNumber, name, status, driverId);
+		return new Vehicle(vin, regNumber, name, status);
 	}
 	
 	public VehicleTestBuilder setVin(String vin) {

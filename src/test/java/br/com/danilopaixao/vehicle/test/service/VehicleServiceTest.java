@@ -3,6 +3,8 @@ package br.com.danilopaixao.vehicle.test.service;
 
 import static org.junit.Assert.assertNull;
 
+import java.time.LocalDateTime;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -39,27 +41,27 @@ public class VehicleServiceTest {
 	
 	@Test
 	public void testUpdateVehicleON() throws Exception{
-		vehicleService.updateVehicleStatus(vehicleBuilder.buildRandom(StatusEnum.ON).getVin(), StatusEnum.ON, new Location());
+		vehicleService.updateVehicleStatus(vehicleBuilder.buildRandom(StatusEnum.ON).getVin(), StatusEnum.ON, new Location(), LocalDateTime.now());
 	}
 	
 	@Test
 	public void testUpdateVehicleOFF() throws Exception{
-		vehicleService.updateVehicleStatus(vehicleBuilder.buildRandom(StatusEnum.ON).getVin(), StatusEnum.OFF, new Location());
+		vehicleService.updateVehicleStatus(vehicleBuilder.buildRandom(StatusEnum.ON).getVin(), StatusEnum.OFF, new Location(), LocalDateTime.now());
 	}
 	
 	@Test(expected = IllegalArgumentException.class)
 	public void testUpdateNullVinVehicle() throws Exception{
-		vehicleService.updateVehicleStatus(null, StatusEnum.OFF, new Location());
+		vehicleService.updateVehicleStatus(null, StatusEnum.OFF, new Location(), LocalDateTime.now());
 	}
 	
 	@Test(expected = IllegalArgumentException.class)
 	public void testUpdateNullStatusVehicle() throws Exception{
-		vehicleService.updateVehicleStatus(vehicleBuilder.buildRandom(StatusEnum.ON).getVin(), null, null);
+		vehicleService.updateVehicleStatus(vehicleBuilder.buildRandom(StatusEnum.ON).getVin(), null, null, LocalDateTime.now());
 	}
 	
 	@Test(expected = IllegalArgumentException.class)
 	public void testUpdateNullVehicle() throws Exception{
-		vehicleService.updateVehicleStatus(null, null, null);
+		vehicleService.updateVehicleStatus(null, null, null, null);
 	}
 	
 	@Test

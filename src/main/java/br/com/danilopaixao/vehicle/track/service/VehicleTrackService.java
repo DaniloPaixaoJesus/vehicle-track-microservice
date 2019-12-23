@@ -8,9 +8,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.geo.Metrics;
-import org.springframework.data.geo.Point;
-import org.springframework.data.geo.Distance;
 import org.springframework.data.geo.Circle;
 import org.springframework.data.geo.Distance;
 import org.springframework.data.geo.Metrics;
@@ -80,7 +77,7 @@ public class VehicleTrackService {
 																	StatusEnum.OFF, 
 																	LocalDateTime.now(), 
 																	vehicleTrack.getGeolocation()));
-						vehicleService.updateVehicleStatus(vehicleTrack.getVin(), StatusEnum.OFF, vehicleTrack.getGeolocation());
+						vehicleService.updateVehicleStatus(vehicleTrack.getVin(), StatusEnum.OFF, vehicleTrack.getGeolocation(), LocalDateTime.now());
 					}
 				}
 			});
@@ -107,9 +104,10 @@ public class VehicleTrackService {
 												vehicleTrackCache.getStatus(), 
 												vehicleTrackCache.getDtStatus(), 
 												vehicleTrackCache.getGeolocation()));
-						vehicleService.updateVehicleStatus(vehicleTrackCache.getVin(), StatusEnum.OFF, vehicleTrackCache.getGeolocation());
+						vehicleService.updateVehicleStatus(vehicleTrackCache.getVin(), StatusEnum.OFF, vehicleTrackCache.getGeolocation(), vehicleTrackCache.getDtStatus());
 					}
 				}
+				vehicleTrackCache.setQueue(queueVehicleTrackName);
 				this.updateVehicleTrackCache(vehicleTrackCache);
 			});
 	}

@@ -1,8 +1,6 @@
 package br.com.danilopaixao.vehicle.track.service;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,7 +18,6 @@ import br.com.danilopaixao.vehicle.track.enums.StatusEnum;
 import br.com.danilopaixao.vehicle.track.model.Location;
 import br.com.danilopaixao.vehicle.track.model.Vehicle;
 import br.com.danilopaixao.vehicle.track.model.VehicleList;
-import br.com.danilopaixao.vehicle.track.model.VehicleTrack;
 import br.com.danilopaixao.vehicle.track.queue.VehicleTrackQueueSender;
 
 
@@ -59,38 +56,28 @@ public class VehicleService {
 		return null;
 	}
 	
-	@HystrixCommand(fallbackMethod ="getAllVehicleFallBack",
-			threadPoolKey = "getAllVehicleThreadPool",
-			threadPoolProperties = {
-					@HystrixProperty(name = "coreSize", value = "75"),
-					@HystrixProperty(name = "maxQueueSize", value = "35")
-			},
-			commandProperties = {
-				@HystrixProperty(name = "execution.isolation.thread.timeoutInMilliseconds", value = "2000"),
-				@HystrixProperty(name = "circuitBreaker.requestVolumeThreshold", value = "5"),
-				@HystrixProperty(name = "circuitBreaker.errorThresholdPercentage", value = "50"),
-				@HystrixProperty(name = "circuitBreaker.sleepWindowInMilliseconds", value = "5000")
-			}
-	)
+//	@HystrixCommand(fallbackMethod ="getAllVehicleFallBack",
+//			threadPoolKey = "getAllVehicleThreadPool",
+//			threadPoolProperties = {
+//					@HystrixProperty(name = "coreSize", value = "75"),
+//					@HystrixProperty(name = "maxQueueSize", value = "35")
+//			},
+//			commandProperties = {
+//				@HystrixProperty(name = "execution.isolation.thread.timeoutInMilliseconds", value = "2000"),
+//				@HystrixProperty(name = "circuitBreaker.requestVolumeThreshold", value = "5"),
+//				@HystrixProperty(name = "circuitBreaker.errorThresholdPercentage", value = "50"),
+//				@HystrixProperty(name = "circuitBreaker.sleepWindowInMilliseconds", value = "5000")
+//			}
+//	)
 	public VehicleList getAllVehicle() {
-		return restTemplate.getForObject(vehicleRestApiUrl+"/vehicles", VehicleList.class);
+		String url = vehicleRestApiUrl+"/vehicles";
+		VehicleList result = restTemplate.getForObject(url, VehicleList.class);
+		return result;
 	}
 	//TODO: REMOVER FALLBACK
 	public VehicleList getAllVehicleFallBack() {
 		logger.error("error vehicle rest service ##VehicleService#getAllVehicle({})");
-		List<Vehicle> vehicleList = new ArrayList<Vehicle>();
-		
-		vehicleList.add(new Vehicle("123", "9898989", "Danilo", 
-				StatusEnum.ON, "134124123", 
-				new VehicleTrack("123", "queue", StatusEnum.ON, LocalDateTime.now(), 
-								new Location())));
-		
-		vehicleList.add(new Vehicle("123456", "9898989", "Danilo", 
-						StatusEnum.ON, "134124123", 
-						new VehicleTrack("123456", "queue", StatusEnum.ON, LocalDateTime.now(), 
-										new Location())));
-		VehicleList vehicleListReturn = new VehicleList(vehicleList); 
-		return vehicleListReturn;
+		return null;
 	}
 	
 	@HystrixCommand(fallbackMethod ="getVehicleFallBack",
@@ -114,7 +101,7 @@ public class VehicleService {
 	}
 	public Vehicle getVehicleFallBack(final String vin) {
 		logger.error("error vehicle rest service ##VehicleService#getVehicle({})", vin);
-		return new Vehicle(vin, "NOTFOUND", "NOTFOUND", StatusEnum.OFF, "NOTFOUND");
+		return new Vehicle(vin, "NOTFOUND", "NOTFOUND", StatusEnum.OFF);
 	}
 	
 	
@@ -131,21 +118,21 @@ public class VehicleService {
 				@HystrixProperty(name = "circuitBreaker.sleepWindowInMilliseconds", value = "5000")
 			}
 	)
-	public void updateVehicleStatus(final String vin, StatusEnum status, Location location){
+	public void updateVehicleStatus(final String vin, StatusEnum status, Location location, LocalDateTime dateTime){
 		if(StringUtils.isEmpty(vin)
 				|| StringUtils.isEmpty(status)
 				|| StringUtils.isEmpty(location)) {
 			logger.error("invalid argument ##VehicleService#updateVehicle({}, {}, {})", vin, status, location);
 			throw new IllegalArgumentException("location, vin or status null");
 		}
-		logger.info("##VehicleService#updateVehicle({}, {}, {})", vin, status, location);
+		logger.info("##VehicleService#updateVehicleStatus({}, {}, {})", vin, status, location);
 		try {
-			vehicleTrackQueueSender.sendToVehicleServiceQueue(vin, status, location);
+			vehicleTrackQueueSender.sendToVehicleServiceQueue(vin, status, location, dateTime);
 		} catch (JsonProcessingException e) {
 			throw new RuntimeException(e);
 		}
 	}
-	public void updateVehicleStatusFallBack(final String vin, StatusEnum status, Location location) {
+	public void updateVehicleStatusFallBack(final String vin, StatusEnum status, Location location, LocalDateTime dateTime) {
 		logger.error("error vehicle rest service ##VehicleService#updateVehicle({}, {}, {})", vin, status, location);
 	}
 	

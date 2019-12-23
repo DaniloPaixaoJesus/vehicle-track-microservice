@@ -9,9 +9,9 @@ public final class VehicleTrackCacheMapper {
 	
 	public static final Function<Vehicle, VehicleTrackCache> 
 		fromVehicle = vehicle -> new VehicleTrackCache(vehicle.getVin(), 
-												vehicle.getVehicleTrack().getQueue(), 
-												vehicle.getStatus(), 
-												vehicle.getVehicleTrack().getDtStatus(), 
-												vehicle.getVehicleTrack().getGeolocation());
+										null, 
+										vehicle.getStatus(), 
+										vehicle.getDtStatus(), 
+										vehicle.getGeolocation());
 
 }

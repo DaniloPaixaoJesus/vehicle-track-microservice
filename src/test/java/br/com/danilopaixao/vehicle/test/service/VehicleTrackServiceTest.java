@@ -6,6 +6,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -63,7 +64,8 @@ public class VehicleTrackServiceTest {
 		verify(vehicleTrackRepository, times(vehicleQuantity)).save(vehicleTrackListFound.get(0));
 		verify(vehicleService, times(vehicleQuantity)).updateVehicleStatus(vehicleTrackListFound.get(0).getVin(), 
 															StatusEnum.OFF, 
-															vehicleTrackListFound.get(0).getGeolocation());
+															vehicleTrackListFound.get(0).getGeolocation(),
+															vehicleTrackListFound.get(0).getDtStatus());
 	}
 	
 	@Test
@@ -79,7 +81,7 @@ public class VehicleTrackServiceTest {
 		Whitebox.setInternalState(vehicleTrackService, "secondsToOfffline", 61);
 		vehicleTrackService.processOffLineVehicle();
 		verify(vehicleTrackRepository, times(0)).save(any(VehicleTrackCache.class));
-		verify(vehicleService, times(0)).updateVehicleStatus(any(String.class), any(StatusEnum.class), any(Location.class));
+		verify(vehicleService, times(0)).updateVehicleStatus(any(String.class), any(StatusEnum.class), any(Location.class), any(LocalDateTime.class));
 	}
 	
 	@Test
@@ -95,7 +97,7 @@ public class VehicleTrackServiceTest {
 		Whitebox.setInternalState(vehicleTrackService, "secondsToOfffline", 60);
 		vehicleTrackService.processOffLineVehicle();
 		verify(vehicleTrackRepository, times(0)).save(any(VehicleTrackCache.class));
-		verify(vehicleService, times(0)).updateVehicleStatus(any(String.class), any(StatusEnum.class), any(Location.class));
+		verify(vehicleService, times(0)).updateVehicleStatus(any(String.class), any(StatusEnum.class), any(Location.class), any(LocalDateTime.class));
 	}
 	
 	@Test
@@ -104,7 +106,7 @@ public class VehicleTrackServiceTest {
 		Whitebox.setInternalState(vehicleTrackService, "secondsToOfffline", 60);
 		vehicleTrackService.processOffLineVehicle();
 		verify(vehicleTrackRepository, times(0)).save(any(VehicleTrackCache.class));
-		verify(vehicleService, times(0)).updateVehicleStatus(any(String.class), any(StatusEnum.class), any(Location.class));
+		verify(vehicleService, times(0)).updateVehicleStatus(any(String.class), any(StatusEnum.class), any(Location.class), any(LocalDateTime.class));
 	}
 	
 	private List<VehicleTrackCache> getListVehicleTrackRandomVehicle(int quantity, int minBefore, int minIniBefore, StatusEnum status){

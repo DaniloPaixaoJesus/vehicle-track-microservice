@@ -48,7 +48,7 @@ public class VehicleTrackServiceApplication {
     }
     
     @Bean
-	@LoadBalanced
+//	@LoadBalanced
 	public RestTemplate getRestTemplate() {
     	RestTemplate restTemplate = new RestTemplate();
 		final MappingJackson2HttpMessageConverter mappingJackson2HttpMessageConverterSi = this

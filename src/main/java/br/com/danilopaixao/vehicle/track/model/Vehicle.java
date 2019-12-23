@@ -1,9 +1,16 @@
 package br.com.danilopaixao.vehicle.track.model;
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
+
+import org.springframework.data.annotation.Id;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
+import br.com.danilopaixao.vehicle.track.config.LocalDateTimeDeserializer;
+import br.com.danilopaixao.vehicle.track.config.LocalDateTimeSerializer;
 import br.com.danilopaixao.vehicle.track.enums.StatusEnum;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -12,35 +19,27 @@ public class Vehicle implements Serializable{
 	/**
 	 * 
 	 */
-	private static final long serialVersionUID = 1564541072875906508L;
+	private static final long serialVersionUID = 5805672437440193950L;
 	
+	@Id
 	private String vin;
 	private String regNumber;
 	private String name;
-	private String driverId;
 	private StatusEnum status;
-	private VehicleTrack vehicleTrack;
+	private Location geolocation;
+	
+	@JsonSerialize(using = LocalDateTimeSerializer.class)
+	@JsonDeserialize(using = LocalDateTimeDeserializer.class)
+	private LocalDateTime dtStatus;
 
 	public Vehicle() {}
-	
-	public Vehicle(String vin, String regNumber, String name, StatusEnum status, 
-						String driverId, VehicleTrack vehicleTrack) {
-		super();
-		this.vin = vin;
-		this.regNumber = regNumber;
-		this.name = name;
-		this.status = status;
-		this.driverId = driverId;
-		this.vehicleTrack = vehicleTrack;
-	}
 
-	public Vehicle(String vin, String regNumber, String name, StatusEnum status, String driverId) {
+	public Vehicle(String vin, String regNumber, String name, StatusEnum status) {
 		super();
 		this.vin = vin;
 		this.regNumber = regNumber;
 		this.name = name;
 		this.status = status;
-		this.driverId = driverId;
 	}
 
 	public String getName() {
@@ -49,15 +48,6 @@ public class Vehicle implements Serializable{
 
 	public void setName(String name) {
 		this.name = name;
-	}
-
-
-	public String getDriverId() {
-		return driverId;
-	}
-
-	public void setDriverId(String driverId) {
-		this.driverId = driverId;
 	}
 
 	public String getVin() {
@@ -83,20 +73,27 @@ public class Vehicle implements Serializable{
 	public void setStatus(StatusEnum status) {
 		this.status = status;
 	}
-	
-	public VehicleTrack getVehicleTrack() {
-		return vehicleTrack;
+
+	public Location getGeolocation() {
+		return geolocation;
 	}
 
-	public void setVehicleTrack(VehicleTrack vehicleTrack) {
-		this.vehicleTrack = vehicleTrack;
+	public void setGeolocation(Location geolocation) {
+		this.geolocation = geolocation;
+	}
+	
+	public LocalDateTime getDtStatus() {
+		return dtStatus;
+	}
+
+	public void setDtStatus(LocalDateTime dtStatus) {
+		this.dtStatus = dtStatus;
 	}
 
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((driverId == null) ? 0 : driverId.hashCode());
 		result = prime * result + ((name == null) ? 0 : name.hashCode());
 		result = prime * result + ((regNumber == null) ? 0 : regNumber.hashCode());
 		result = prime * result + ((status == null) ? 0 : status.hashCode());
@@ -113,11 +110,6 @@ public class Vehicle implements Serializable{
 		if (getClass() != obj.getClass())
 			return false;
 		Vehicle other = (Vehicle) obj;
-		if (driverId == null) {
-			if (other.driverId != null)
-				return false;
-		} else if (!driverId.equals(other.driverId))
-			return false;
 		if (name == null) {
 			if (other.name != null)
 				return false;
@@ -140,8 +132,7 @@ public class Vehicle implements Serializable{
 
 	@Override
 	public String toString() {
-		return "Vehicle [vin=" + vin + ", regNumber=" + regNumber + ", name=" + name + ", driverId=" + driverId
-				+ ", status=" + status + "]";
+		return "Vehicle [vin=" + vin + ", regNumber=" + regNumber + ", name=" + name + ", status=" + status + "]";
 	}
 
 }

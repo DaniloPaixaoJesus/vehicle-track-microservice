@@ -48,6 +48,8 @@ public class VehicleTrackCache implements Serializable {
 	}
 	
 	public boolean isOffLineVehicle(int seconds) {
+		if(dtStatus == null)
+			return Boolean.TRUE;
 		long diff = DateTimeUtils.secsDiff(dtStatus, LocalDateTime.now());
 		return diff > seconds ? Boolean.TRUE : Boolean.FALSE;
 	}

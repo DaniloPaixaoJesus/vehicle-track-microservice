@@ -51,12 +51,12 @@ public class VehicleTrackQueueSender {
         return vehicleTrackCache;
     }
     
-    public void sendToVehicleServiceQueue(final String vin, StatusEnum status, Location location) throws JsonProcessingException{
+    public void sendToVehicleServiceQueue(final String vin, StatusEnum status, Location location, LocalDateTime dateTime) throws JsonProcessingException{
     	logger.info("###### VehicleTrackQueueSender#sendToVehicleServiceQueue:{}, {}, {}", vin, status, location);
     	ObjectMapper jsonMapper = new ObjectMapper();
     	VehicleTrack vehicleTrack = new VehicleTrack(vin, vehicleTrackQueueName, 
-    																StatusEnum.ON, 
-    																LocalDateTime.now(), 
+    																status, 
+    																dateTime, 
     																location);
     	 String payload = jsonMapper.writeValueAsString(vehicleTrack);
     	 rabbitTemplate.convertAndSend(queueVehicleServiceUpdate, payload);
