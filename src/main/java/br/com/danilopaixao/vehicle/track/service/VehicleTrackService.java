@@ -49,6 +49,9 @@ public class VehicleTrackService {
 	@Autowired
 	private VehicleService vehicleService;
 	
+	@Autowired
+	private VehicleSocketService vehicleWebSocketService;
+	
 	@Value("${queue.vehicle.track}")
 	private String queueVehicleTrackName;
 	
@@ -78,6 +81,7 @@ public class VehicleTrackService {
 																	LocalDateTime.now(), 
 																	vehicleTrack.getGeolocation()));
 						vehicleService.updateVehicleStatus(vehicleTrack.getVin(), StatusEnum.OFF, vehicleTrack.getGeolocation(), LocalDateTime.now());
+						vehicleWebSocketService.updateStatusWebSocket(vehicleTrack.getVin(), StatusEnum.OFF, vehicleTrack.getGeolocation());
 					}
 				}
 			});

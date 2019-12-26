@@ -71,7 +71,7 @@ public class VehicleTrackQueueConsumer {
         		
         		vehicleTrackService.insertVehicleTrackCache(vehicleTrackCache);
         		vehicleTrackService.insertVehicleTrack(VehicleTrackMapper.fromVehicleTrackCache(vehicleTrackCache));
-        		vehicleWebSocketService.updateStatusWebSocket(vehicleTrackPayload.getVin(), StatusEnum.ON);
+        		vehicleWebSocketService.updateStatusWebSocket(vehicleTrackPayload.getVin(), StatusEnum.ON, vehicleTrackPayload.getGeolocation());
         		vehicleService.updateVehicleStatus(vehicleTrackPayload.getVin(), StatusEnum.ON, vehicleTrackPayload.getGeolocation(), LocalDateTime.now());
         	}else{
         		logger.info("###### VehicleTrackQueueConsumer#receive - update cache database, vin {}, status {}", vehicleTrackPayload.getVin(), StatusEnum.ON);
@@ -81,7 +81,7 @@ public class VehicleTrackQueueConsumer {
         		
         		vehicleTrackService.updateVehicleTrackCache(vehicleTrackCache);
         		vehicleTrackService.insertVehicleTrack(VehicleTrackMapper.fromVehicleTrackCache(vehicleTrackCache));
-        		vehicleWebSocketService.updateStatusWebSocket(vehicleTrackPayload.getVin(), StatusEnum.ON);
+        		vehicleWebSocketService.updateStatusWebSocket(vehicleTrackPayload.getVin(), StatusEnum.ON, vehicleTrackPayload.getGeolocation());
         		vehicleService.updateVehicleStatus(vehicleTrackPayload.getVin(), StatusEnum.ON, vehicleTrackPayload.getGeolocation(), LocalDateTime.now());
         	}
         	logger.info("###### VehicleTrackQueueConsumer#receive: end of process");        	

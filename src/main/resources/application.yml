@@ -46,3 +46,5 @@ br:
       service:
         vehicle:
           url: ${VEHICLE_SERVICE_URL:http://vehicle-service/v1}
+        websocket:
+          url: ${VEHICLE_WEB_SOCKET_URL:http://localhost:8085/api/v1}

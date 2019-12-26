@@ -11,6 +11,7 @@ import com.netflix.hystrix.contrib.javanica.annotation.HystrixCommand;
 import com.netflix.hystrix.contrib.javanica.annotation.HystrixProperty;
 
 import br.com.danilopaixao.vehicle.track.enums.StatusEnum;
+import br.com.danilopaixao.vehicle.track.model.Location;
 import br.com.danilopaixao.vehicle.track.model.VehicleTrackWSocket;
 
 
@@ -19,8 +20,8 @@ public class VehicleSocketService {
 	
 	private static final Logger logger = LoggerFactory.getLogger(VehicleSocketService.class);
 	
-	@Value("${br.com.danilopaixao.service.vehicle.socket.url}")
-	private static String urlVehicleSocketService;
+	@Value("${br.com.danilopaixao.service.websocket.url}")
+	private String urlVehicleSocketService;
 	
 	@Autowired
 	private RestTemplate restTemplate;
@@ -38,13 +39,13 @@ public class VehicleSocketService {
 				@HystrixProperty(name = "circuitBreaker.sleepWindowInMilliseconds", value = "5000")
 			}
 	)
-	public String updateStatusWebSocket(String vin, StatusEnum status) {
+	public String updateStatusWebSocket(String vin, StatusEnum status, Location location) {
 		logger.info("##VehicleSocketService#updateStatusWebSocket vin {}, status {}", vin, status);
-		String url = urlVehicleSocketService +"/" + vin + "/status";
-		restTemplate.put(url, new VehicleTrackWSocket(vin, status));
+		String url = urlVehicleSocketService +"/vehicle/" + vin + "/status";
+		restTemplate.put(url, new VehicleTrackWSocket(vin, status.toString(), location));
 		return vin;
 	}
-	public String updateStatusWebSocketFallBack(String vin, StatusEnum status) {
+	public String updateStatusWebSocketFallBack(String vin, StatusEnum status, Location location) {
 		logger.error("##VehicleSocketService#updateStatusWebSocket vin {}, status {}", vin, status);
 		return vin;
 	}
